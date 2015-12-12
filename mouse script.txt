@@ -1,0 +1,1109 @@
+#===============================================================================
+# Mouse System
+# By Jet10985 (Jet)
+# Some Code by: Woratana, Berka
+# Uses: Modern Algebra's Path Finding Script
+# Super Heavy Testing/Debug Help/Requested By: Nathanial (Beleren)
+#===============================================================================
+# This script will allow full use of the mouse inside of rmvx for various
+# purposes.
+# This script has: 6 customization options.
+#===============================================================================
+# Overwritten Methods:
+# None
+#-------------------------------------------------------------------------------
+# Aliased methods:
+# Scene_Map: update, terminate, update_transfer_player
+# Input: update, trigger?, press?, repeat?, dir4, dir8
+# Window_Selectable: update, top_row=
+# Scene_File: update
+# Window_NameInput: update
+# Game_Temp: initialize
+# Game_Event: initialize, update
+#===============================================================================
+
+#==============================================================================
+#  Path Finding
+#  Version: 2.0
+#  Author: modern algebra (rmrk.net)
+#  Date: April 10, 2008
+#==============================================================================
+#  Thanks:
+#    Patrick Lester! For his tutorial on A* Pathfinding algorithm (found at: 
+#        http://www.gamedev.net/reference/articles/article2003.asp) as well as 
+#        another amazingly helpful tutorial on using binary heaps (found at: 
+#        http://www.policyalmanac.org/games/binaryHeaps.htm). Without his excellent
+#        tutorials, this script would not exist. So major thanks to him.
+#    Zeriab, for tricking me into believing that this was an actual exercise.
+#        Also, his table printout actually makes Tables useable :P
+#==============================================================================
+
+=begin
+Showing text above event when mouse hovers:
+
+If you want a message to appear over an event's head if the mouse is hovering
+over the event, put this comment in the event:
+
+MOUSE TEXT MESSAGE HERE
+
+everything after TEXT will be the hovering display.
+--------------------------------------------------------------------------------
+Change mouse picture above event when mouse hovers:
+
+If you want the mouse's picture to temporarily change whne over an event, put
+this comment in the event
+
+MOUSE PIC NAME/NUMBER
+
+if you put a name, the mouse will become that picture, but if you put a number
+then the mouse will become the icon that is the id number
+--------------------------------------------------------------------------------
+Specific mouse click movement routes:
+
+If you want the player to land specifically in a square around an event when
+they click to move on the event, put one of these comments in the event:
+
+MOUSE MOVE UP/LEFT/RIGHT/DOWN
+
+only put the direction that you want the player to land on.
+--------------------------------------------------------------------------------
+Click to activate:
+
+If you want an event to automatically start when it is clicked on, place
+this in an event comment:
+
+MOUSE CLICK
+--------------------------------------------------------------------------------
+Don't stop the player when walking over a touch event:
+
+By default, this script will stop a mouse-caused movement if the player walks
+over/under a player touch/event touch event. If you want the event to activate,
+but for the player to keep walking to their destination, put this comment in the
+event:
+
+MOUSE NOSTOP
+--------------------------------------------------------------------------------
+Ignore Events:
+
+To have an event be ignored when the mouse makes it's movement path (as if the
+event isn't there), put this comment in the event:
+
+MOUSE THROUGH
+--------------------------------------------------------------------------------
+Extra Notes:
+
+In selectable windows that have more items than what's shown, players can
+either put the mouse below the window to scroll down, OR use the mouse's
+scroll wheel to scroll up/down.
+
+You can activate action button events by standing next to the event and clicking
+on it with the mouse.
+=end
+module JetMouse
+  
+  # If you are using a graphic, this is it.
+  # It must be in the Graphics/System folder.
+  CURSOR_PICTURE = "cursor-mouse"
+  
+  # If you aren't using a graphic, this icon will be the mouse.
+  # To use the icon, just put a non-existant picture as the above config
+  ICON_INDEX = 3
+  
+  # Do you want the player to be able to move by clicking the mouse?
+  ALLOW_MOUSE_MOVEMENT = true
+  
+  # Do you want mouse movement to do 8-dir walking?
+  # Requires 8-Dir Walking by Jet.
+  DO_8DIR_WALKING = false
+  
+  # Turning this switch on will make the mouse invisible and unusuable until
+  # the switch is turned off
+  TURN_MOUSE_OFF_SWITCH = 20
+  
+  # Do you want the mouse to check for mouse wheel scrolling in selectbale
+  # windows? Not using this may reduce some rare cases of lag.
+  USE_WHEEL_DETECTION = false
+  
+end
+
+#===============================================================================
+# DON'T EDIT FURTHER UNLESS YOU KNOW WHAT TO DO.
+#===============================================================================
+module Mouse
+  
+  Get_Message = Win32API.new('user32', 'GetMessage', 'plll', 'l')
+  GetAsyncKeyState = Win32API.new("user32", "GetAsyncKeyState", 'i', 'i')
+  GetKeyState = Win32API.new("user32", "GetKeyState", 'i', 'i')
+  SetCursorPos = Win32API.new('user32', 'SetCursorPos', 'nn', 'n')
+  GetCursorPo = Win32API.new('user32', 'GetCursorPos', 'p', 'i')
+  ScreenToClient = Win32API.new('user32', 'ScreenToClient', 'lp', 'i')
+  FindWindowA = Win32API.new('user32', 'FindWindowA', 'pp', 'l')
+  GetClientRect = Win32API.new('user32', 'GetClientRect', 'lp', 'i')
+  GetWindowRect = Win32API.new('user32', 'GetWindowRect', 'lp', 'i')
+  contents = File.open('Game.ini', 'r') { |f| f.read }
+  q = contents[/Title=(.+)/].nil? ? "cccc" : $1
+  @handle = FindWindowA.call('RGSS Player', q)
+  module_function
+  
+  Point = Struct.new(:x, :y)
+  
+  Message = Struct.new(:message, :wparam, :lparam, :pt)
+  
+  Param = Struct.new(:x, :y, :scroll)
+  
+  Scroll = 0x0000020A
+  
+  def hiword(dword); return ((dword&0xffff0000) >> 16)&0x0000ffff; end
+  def loword(dword); return dword&0x0000ffff; end
+    
+  def word2signed_short(value)
+    return value if (value&0x8000) == 0
+    return -1 * ((~value&0x7fff) + 1)
+  end
+  
+  def unpack_dword(buffer, offset = 0)
+    ret = buffer[offset + 0]&0x000000ff
+    ret |= (buffer[offset + 1] << (8 * 1))&0x0000ff00
+    ret |= (buffer[offset + 2] << (8 * 2))&0x00ff0000
+    ret |= (buffer[offset + 3] << (8 * 3))&0xff000000
+    return ret
+  end
+  
+  def unpack_msg(buffer)
+    msg = Message.new; msg.pt = Point.new
+    msg.message=unpack_dword(buffer,4*1)
+    msg.wparam = unpack_dword(buffer, 4 * 2)
+    msg.lparam = unpack_dword(buffer,4*3)
+    msg.pt.x = unpack_dword(buffer, 4 * 5)
+    msg.pt.y = unpack_dword(buffer, 4 * 6)
+    return msg
+  end
+  
+  def wmcallback(msg)
+    return unless msg.message == Scroll
+    param = Param.new
+    param.x = word2signed_short(loword(msg.lparam))
+    param.y = word2signed_short(hiword(msg.lparam))
+    param.scroll = word2signed_short(hiword(msg.wparam))
+    return [param.x, param.y, param.scroll]
+  end
+  
+  def click?(button)
+    return false if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    return true if @keys.include?(button)
+    return false
+  end 
+  
+  def press?(button)
+    return false if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    return true if @press.include?(button)
+    return false
+  end
+  
+  def set_pos(x_pos = 0, y_pos = 0)
+    width,height = client_size
+    if (x_pos.between?(0, width) && y_pos.between?(0, height))
+      SetCursorPos.call(client_pos[0] + x_pos,client_pos[1] + y_pos)
+    end
+  end
+  
+  def update
+    return if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    @pos = Mouse.pos
+    @keys, @press = [], []
+    @keys.push(1) if GetAsyncKeyState.call(1)&0x01==1
+    @keys.push(2) if GetAsyncKeyState.call(2)&0x01==1
+    @keys.push(3) if GetAsyncKeyState.call(4)&0x01==1
+    @press.push(1) if pressed?(1)
+    @press.push(2) if pressed?(2)
+    @press.push(3) if pressed?(4)
+  end 
+  
+  def pressed?(key)
+    return true unless GetKeyState.call(key).between?(0, 1)
+    return false
+  end
+  
+  def global_pos
+    pos = [0, 0].pack('ll')
+    GetCursorPo.call(pos) != 0 ? (return pos.unpack('ll')):(return [0, 0])
+  end
+  
+  def pos
+    return 0, 0 if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    x, y = screen_to_client(*global_pos)
+    width, height = client_size
+    begin
+      x = 0 if x <= 0; y = 0 if y <= 0
+      x = width if x >= width; y = height if y >= height
+      return x, y
+    end
+  end
+  
+  def screen_to_client(x, y)
+    return nil unless x && y
+    pos = [x, y].pack('ll')
+    ScreenToClient.call(@handle, pos) != 0 ?(return pos.unpack('ll')):(return [0, 0])
+  end
+  
+  def client_size
+    rect = [0, 0, 0, 0].pack('l4')
+    GetClientRect.call(@handle, rect)
+    right,bottom = rect.unpack('l4')[2..3]
+    return right, bottom
+  end
+  
+  def client_pos
+    rect=[0, 0, 0, 0].pack('l4')
+    GetWindowRect.call(@handle, rect)
+    left, upper = rect.unpack('l4')[0..1]
+    return left + 4, upper + 30
+  end
+  
+  def grid
+    return [-1, -1] if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    return [-1, -1] if @pos.nil?
+    return [(@pos[0]/32), (@pos[1]/32)]
+  end
+  
+  def true_grid
+    return [grid[0] + $game_map.display_x / 256, grid[1] + $game_map.display_y / 256]
+  end
+  
+  def area?(x, y, width, height)
+    return false if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    return false if @pos.nil?
+    return @pos[0].between?(x, width + x) && @pos[1].between?(y, height + y)
+  end
+  
+  def scroll
+    msg="\0"*32;Get_Message.call(msg,0,0,0);r=wmcallback(unpack_msg(msg))
+    return r if !r.nil?
+  end
+end
+
+class Sprite_Cursor < Sprite_Base
+  
+  attr_accessor :current_cursor, :not_default
+  
+  include JetMouse
+  
+  def initialize
+    super
+    @current_cursor = ""
+    @not_default = false
+    Win32API.new('user32', 'ShowCursor', 'i', 'i').call(0)
+    self.z = 5004
+    create_cursor(CURSOR_PICTURE)
+    $game_switches = []
+    update
+  end
+  
+  def create_cursor(cursor = "")
+    self.bitmap.dispose unless self.bitmap.nil?
+    self.bitmap = nil
+    begin
+      self.bitmap = Cache.system(cursor)
+      @current_cursor = cursor
+    rescue
+      self.bitmap = Bitmap.new(24, 24)
+      bitmap = Cache.system("Iconset")
+      rect = Rect.new(ICON_INDEX % 16 * 24, ICON_INDEX / 16 * 24, 24, 24)
+      self.bitmap.blt(0, 0, bitmap, rect)
+      @current_cursor = ICON_INDEX
+    end
+    @not_default = false
+  end
+  
+  def change_cursor(cursor)
+    self.bitmap.dispose unless self.bitmap.nil?
+    self.bitmap = nil
+    begin
+      self.bitmap = Cache.system(cursor)
+      @current_cursor = cursor
+      @not_default = true
+    rescue
+      begin
+        self.bitmap = Bitmap.new(24, 24)
+        bitmap = Cache.system("Iconset")
+        rect = Rect.new(cursor % 16 * 24, cursor / 16 * 24, 24, 24)
+        self.bitmap.blt(0, 0, bitmap, rect)
+        @current_cursor = cursor
+        @not_default = true
+      rescue
+        create_cursor(CURSOR_PICTURE)
+      end
+    end
+  end
+
+  def update
+    if $game_switches[TURN_MOUSE_OFF_SWITCH]
+      self.opacity = 0 unless self.opacity == 0
+    end
+    self.opacity = 255 unless self.opacity == 255
+    super
+    x = self.x
+    y = self.y
+    self.x, self.y = Mouse.pos
+    self.x -= 8 if @not_default
+    self.y -= 8 if @not_default
+  end
+    
+  def dispose
+    super
+  end
+end
+
+$cursor = Sprite_Cursor.new
+
+module Input
+  
+  class << self
+    
+    alias jet5888_press? press? unless $@
+    def press?(arg)
+      if arg == Input::C
+        return true if Mouse.press?(1)
+      elsif arg == Input::B
+        return true if Mouse.press?(2)
+      end
+      jet5888_press?(arg)
+    end
+    
+    alias jet5888_repeat? repeat? unless $@
+    def repeat?(arg)
+      if arg == Input::C
+        return true if Mouse.click?(1)
+      elsif arg == Input::B
+        return true if Mouse.click?(2)
+      end
+      jet5888_repeat?(arg)
+    end
+    
+    alias jet5888_trigger? trigger? unless $@
+    def trigger?(arg)
+      if arg == Input::C
+        return true if Mouse.click?(1)
+      elsif arg == Input::B
+        return true if Mouse.click?(2)
+      end
+      jet5888_trigger?(arg)
+    end
+    
+    alias jet8432_update update unless $@
+    def update(*args, &block)
+      jet8432_update(*args, &block)
+      if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH] && $cursor.opacity != 0
+        $cursor.opacity = 0
+      end
+      $cursor.update unless $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+      Mouse.update unless $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    end
+  
+    alias jet1626_dir4 dir4 unless $@
+    def dir4(*args, &block)
+      if !$game_temp.nil?
+        if $game_temp.move_because_of_mouse
+          if !$game_temp.mouse_path.empty? && $game_player.movable? && 
+              !$game_map.interpreter.running? && $scene.is_a?(Scene_Map)
+            f = $game_temp.mouse_path.reverse!.pop
+            $game_temp.mouse_path.reverse!
+            return f.code * 2
+          else
+            $game_temp.move_because_of_mouse = false
+          end
+        end
+      end
+      jet1626_dir4(*args, &block)
+    end
+    
+    alias jet1626_dir8 dir8 unless $@
+    def dir8(*args, &block)
+      if !$game_temp.nil?
+        if $game_temp.move_because_of_mouse
+          if !$game_temp.mouse_path.empty? && $game_player.movable? && 
+              !$game_map.interpreter.running? && $scene.is_a?(Scene_Map)
+            f = $game_temp.mouse_path.reverse!.pop
+            $game_temp.mouse_path.reverse!
+            if [1, 2, 3, 4].include?(f.code)
+              return f.code * 2
+            else
+              case f.code
+              when 5
+                return 1
+              when 6
+                return 3
+              when 7
+                return 7
+              when 8
+                return 9
+              end
+            end
+          else
+            $game_temp.move_because_of_mouse = false
+          end
+        end
+      end
+      jet1626_dir8(*args, &block)
+    end
+  end
+end
+
+class Game_Character
+  
+  def find_mouse_path(trgt_x, trgt_y)
+    path = $game_map.find_path (self.x, self.y, trgt_x, trgt_y, 
+    JetMouse::DO_8DIR_WALKING, 0, self)
+    return [] if path.empty? or trgt_x == self.x && trgt_y == self.y
+    return path.reverse!
+  end
+end
+
+class Game_Map
+
+  def removefrom_binaryheap
+    @open_nodes[1] = @open_nodes[@listsize]
+    @listsize -= 1
+    v = 1
+    loop do
+      u = v
+      w = 2*u
+      if w + 1 <= @listsize
+        v = w if @total_cost[@open_nodes[u]] >= @total_cost[@open_nodes[w]]
+        v = w + 1 if @total_cost[@open_nodes[v]] >= @total_cost[@open_nodes[w + 1]]
+      elsif w <= @listsize
+        v = w if @total_cost[@open_nodes[u]] >= @total_cost[@open_nodes[w]]
+      end
+      if u == v
+        break
+      else
+        temp = @open_nodes[u]
+        @open_nodes[u] = @open_nodes[v]
+        @open_nodes[v] = temp
+      end
+    end
+  end
+  
+  def find_path (src_x, src_y, trgt_x, trgt_y, diagonal, max_iterations, char)
+    $game_temp.making_path = true
+    path = []
+    return path if !char.passable? (trgt_x, trgt_y)
+    max_elements = width*height + 2
+    openx = Table.new (max_elements)
+    openy = Table.new (max_elements)
+    @open_nodes = Table.new (max_elements)
+    @total_cost = Table.new (max_elements)
+    heuristic = Table.new (max_elements)
+    step_cost = Table.new (width, height)
+    parent_x = Table.new (width, height)
+    parent_y = Table.new (width, height)
+    actual_list = Table.new (width, height)
+    new_openid = 1
+    @open_nodes[1] = 1
+    openx[1] = src_x
+    openy[1] = src_y
+    dist = [(trgt_x - src_x).abs, (trgt_y - src_y).abs]
+    heuristic[1] = diagonal ? (dist.max*14) + (dist.min*10) : (dist[0] + dist[1])*10
+    @total_cost[1] = heuristic[1]
+    actual_list[src_x, src_y] = 1
+    @listsize = 1
+    count = 0
+    loop do
+      break if actual_list[trgt_x, trgt_y] != 0
+      count += 1
+      Graphics.update if count % 500 == 0
+      return path if count == max_iterations
+      return path if @listsize == 0
+      node = @open_nodes[1]
+      parent_xval, parent_yval = openx[node], openy[node]
+      actual_list[parent_xval, parent_yval] = 2
+      removefrom_binaryheap
+      for i in 0...8
+        break if i > 3 && !diagonal
+        x, y = case i
+        when 0 then [parent_xval, parent_yval - 1]
+        when 1 then [parent_xval, parent_yval + 1]
+        when 2 then [parent_xval - 1, parent_yval] 
+        when 3 then [parent_xval + 1, parent_yval]
+        when 4 then [parent_xval - 1, parent_yval - 1]
+        when 5 then [parent_xval + 1, parent_yval - 1]
+        when 6 then [parent_xval - 1, parent_yval + 1]
+        when 7 then [parent_xval + 1, parent_yval + 1]
+        end
+        next if actual_list[x,y] == 2
+        next unless char.passable? (x, y)
+        if i > 3
+          next unless case i
+          when 4 then char.passable? (x + 1, y) || char.passable? (x, y + 1)
+          when 5 then char.passable? (x - 1, y) || char.passable? (x, y + 1)
+          when 6 then char.passable? (x + 1, y) || char.passable? (x, y - 1)
+          when 7 then char.passable? (x - 1, y) || char.passable? (x, y - 1)
+          end
+        end
+        plus_step_cost = ((x - parent_xval).abs + (y - parent_yval).abs) > 1 ? 14 : 10
+        temp_step_cost = step_cost[parent_xval, parent_yval] + plus_step_cost
+        if actual_list[x,y] == 1
+          if temp_step_cost < step_cost[x, y]
+            parent_x[x, y] = parent_xval
+            parent_y[x, y] = parent_yval
+            step_cost[x, y] = temp_step_cost
+            index = 1
+            while index < @listsize
+              index += 1
+              break if openx[@open_nodes[index]] == x &&
+                                                openy[@open_nodes[index]] == y
+            end
+            @total_cost[@open_nodes[index]] = temp_step_cost + heuristic[@open_nodes[index]]
+          else
+            next
+          end
+        else
+          new_openid += 1
+          @listsize += 1
+          @open_nodes[@listsize] = new_openid
+          step_cost[x, y] = temp_step_cost
+          d = [(trgt_x - x).abs, (trgt_y - y).abs]
+          heuristic[new_openid] = diagonal ? (d.max*14) + (d.min*10) : (d[0] + d[1])*10
+          @total_cost[new_openid] = temp_step_cost + heuristic[new_openid]
+          parent_x[x, y] = parent_xval
+          parent_y[x, y] = parent_yval
+          openx[new_openid] = x
+          openy[new_openid] = y
+          index = @listsize
+          actual_list[x, y] = 1
+        end
+        while index != 1
+          temp_node = @open_nodes[index]
+          if @total_cost[temp_node] <= @total_cost[@open_nodes[index / 2]] 
+            @open_nodes[index] = @open_nodes[index / 2]
+            index /= 2
+            @open_nodes[index] = temp_node
+          else
+            break
+          end
+        end
+      end
+    end
+    path_x, path_y = trgt_x, trgt_y
+    while path_x != src_x || path_y != src_y
+      prnt_x, prnt_y = parent_x[path_x, path_y], parent_y[path_x, path_y]
+      if path_x < prnt_x
+        code = path_y < prnt_y ? 7 : path_y > prnt_y ? 5 : 2
+      elsif path_x > prnt_x
+        code = path_y < prnt_y ? 8 : path_y > prnt_y ? 6 : 3 
+      else
+        code = path_y < prnt_y ? 4 : 1
+      end
+      path.push (RPG::MoveCommand.new (code))
+      path_x, path_y = prnt_x, prnt_y
+    end
+    $game_temp.making_path = false
+    return path
+  end
+end
+
+class Game_Temp
+  
+  attr_accessor :move_because_of_mouse
+  attr_accessor :mouse_controlled_object
+  attr_accessor :making_path
+  attr_accessor :mouse_path
+  attr_accessor :did_mouse_change
+  
+  alias jet6742_initialize initialize unless $@
+  def initialize(*args, &block)
+    jet6742_initialize(*args, &block)
+    @move_because_of_mouse = false
+    @making_path = false
+    @mouse_path = []
+  end
+end
+
+class Window_Selectable
+  
+  alias jet6742_update update unless $@
+  def update(*args, &block)
+    jet6742_update(*args, &block)
+    form_rect_array if @rect_array.nil?
+    update_mouse if self.active && self.visible && !@rect_array.nil?
+  end
+  
+  alias jet7222_top_row top_row= unless $@
+  def top_row=(*args, &block)
+    @last_cursor_move = 0 if @last_cursor_move.nil?
+    @last_cursor_move -= 1
+    return if @in_rect_loop || @last_cursor_move > 0
+    jet7222_top_row(*args, &block)
+    @last_cursor_move = 10
+  end
+  
+  def form_rect_array
+    @rect_array = []
+    orig_index = @index
+    @in_rect_loop = true
+    (0..@item_max - 1).each do |i|
+      @index = i
+      update_cursor
+      rect = self.cursor_rect
+      ix = self.x + 16 + rect.x
+      iy = self.y + 16 + rect.y
+      @rect_array.push(Rect.new(ix, iy, rect.width, rect.height))
+    end
+    @in_rect_loop = false
+    @index = orig_index
+    update
+  end
+  
+  def update_mouse
+    if JetMouse::USE_WHEEL_DETECTION
+      f = Mouse.scroll
+      if !f.nil?
+        if f[2] < 0
+          if contents.height > self.height && self.oy - contents.height < -self.height + 32
+            self.top_row = self.top_row + 1
+          end
+        else
+          self.top_row = self.top_row - 1 if contents.height > self.height
+        end
+      end
+    end
+    original_index = @index
+    fake_index = -2
+    for rect in @rect_array
+      if Mouse.area?(rect.x - self.ox, rect.y - self.oy, rect.width, rect.height)
+        fake_index = @rect_array.index(rect)
+        break
+      end
+    end
+    @index = fake_index == -2 ? original_index : fake_index
+    update_cursor
+  end
+end
+
+class Window_NameInput
+  
+  alias wor_winnam_upd_mouse update unless $@
+  def update(*args, &block)
+    wor_winnam_upd_mouse(*args, &block)
+    if self.active and self.visible
+      (0..TABLE[@mode].size - 1).each do |i|
+      irect = item_rect(i)
+      irx = self.x + 16 + irect.x - self.ox
+      iry = self.y + 16 + irect.y - self.oy
+      @index = i if Mouse.area?(irx, iry, irect.width, irect.height)
+      end
+    end
+  end
+end
+
+class Window_PartyCommand
+  
+  def update_mouse
+    (0..@item_max - 1).each do |i|
+    irect = item_rect(i)
+    irx = self.viewport.ox + 16 + irect.x - self.ox
+    iry = 288 + 16 + irect.y - self.oy
+    self.index = i if Mouse.area?(irx, iry, irect.width, irect.height)
+    end
+  end
+end
+
+class Window_ActorCommand
+  
+  def update_mouse
+    (0..@item_max - 1).each do |i|
+    irect = item_rect(i)
+    irx = self.viewport.ox + 288 + 16 + irect.x
+    iry = 288 + 16 + irect.y
+    self.index = i if Mouse.area?(irx, iry, irect.width, irect.height)
+    end
+  end
+end
+
+class Window_Message
+  
+  def update_mouse
+    (0..@item_max - 1).each do |i|
+      irect = item_rect(i)
+      irx = self.x + 16 + irect.x - self.ox
+      iry = self.y + 16 + irect.y - self.oy + ($game_message.choice_start * WLH)
+      self.index = i if Mouse.area?(irx, iry, irect.width, irect.height)
+    end
+  end
+end
+
+class Window_ShopSell
+  
+  def refresh
+    super
+    form_rect_array
+  end
+end
+
+class Scene_File
+  
+  alias wor_scefil_upd_mouse update unless $@
+  def update(*args, &block)
+    (0..@item_max - 1).each do |i|
+      ix = @savefile_windows[i].x
+      iy = @savefile_windows[i].y
+      iw = @savefile_windows[i].width
+      ih = @savefile_windows[i].height
+      if Mouse.area?(ix, iy, iw, ih)
+        @savefile_windows[@index].selected = false
+        @savefile_windows[i].selected = true
+        @index = i
+      end
+    end
+    wor_scefil_upd_mouse(*args, &block)
+  end
+end
+
+class Window_EventPopUp < Window_Base
+  
+  def initialize(x, y, width, height, text)
+    super(x, y, width, height)
+    self.opacity = 0
+    @text = text
+    refresh
+  end
+  
+  def refresh
+    self.contents.clear
+    self.contents.draw_text(0, 0, self.width, 24, @text)
+  end
+end
+
+
+class Game_Event
+  
+  attr_accessor :popup_window, :page
+  
+  def check_for_comment(regexp)
+    return false if @list.nil?
+    for item in @list
+      if item.code == 108 or item.code == 408
+        if !item.parameters[0][regexp].nil?
+          return $1.nil? ? true : $1
+        end
+      end
+    end
+    return false
+  end
+  
+  def through
+    return true if check_for_comment(/MOUSE THROUGH/i) && $game_temp.making_path
+    return @through
+  end
+  
+  alias jet2734_update update unless $@
+  def update(*args, &block)
+    jet2734_update(*args, &block)
+    update_mouse_popup
+    update_mouse_change
+  end
+  
+  def update_mouse_popup
+    switch = $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    if Mouse.true_grid == [self.x, self.y] && !switch && !@erased
+      f = self.check_for_comment(/MOUSE TEXT (.+)/i)
+      if f != false
+        q = Bitmap.new(1, 1)
+        size = q.text_size(f)
+        x = self.screen_x - 16 - size.width / 2
+        y = self.screen_y - 52 - size.height / 2
+        if self.popup_window != nil
+          self.popup_window.dispose
+          self.popup_window = nil
+        end
+        self.popup_window = Window_EventPopUp.new(x, y, 
+          size.width + 34, size.height + 34, f)
+        q.dispose
+        q = nil
+      end
+    else
+      if self.popup_window != nil
+        self.popup_window.dispose
+        self.popup_window = nil
+      end
+    end
+  end
+  
+  def update_mouse_change
+    if Mouse.true_grid == [self.x, self.y]
+      f = (self.check_for_comment(/MOUSE PIC (.+)/i) rescue false)
+      if f != false
+        if f.to_i != 0
+          $cursor.change_cursor(f.to_i) unless $cursor.current_cursor == f.to_i
+        else
+          $cursor.change_cursor(f) unless $cursor.current_cursor == f
+        end
+        $game_temp.did_mouse_change = true
+      end
+    end
+  end
+end
+
+
+class Scene_Map
+  
+  alias jet6742_update update unless $@
+  def update(*args, &block)
+    if !$game_message.visible
+      update_mouse_left_click
+    end
+    jet6742_update(*args, &block)
+    check_mouse_change
+  end
+  
+  alias jet7811_terminate terminate unless $@
+  def terminate(*args, &block)
+    for event in $game_map.events.values
+      next if event.popup_window.nil?
+      event.popup_window.dispose unless event.popup_window.disposed?
+      event.popup_window = nil
+    end
+    $cursor.create_cursor(JetMouse::CURSOR_PICTURE) if ![JetMouse::CURSOR_PICTURE,
+      JetMouse::ICON_INDEX].include?($cursor.current_cursor)
+    $cursor.opacity = 0
+    jet7811_terminate(*args, &block)
+    $cursor.opacity = 255 unless $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+  end
+  
+  alias jet8887_update_transfer_player update_transfer_player unless $@
+  def update_transfer_player(*args, &block)
+    if $game_player.transfer?
+      $cursor.create_cursor(JetMouse::CURSOR_PICTURE) if ![JetMouse::CURSOR_PICTURE,
+        JetMouse::ICON_INDEX].include?($cursor.current_cursor)
+    end
+    jet8887_update_transfer_player(*args, &block)
+  end
+  
+  def check_mouse_change
+    return if $game_switches[JetMouse::TURN_MOUSE_OFF_SWITCH]
+    if $game_message.visible || $game_player.transfer?
+      $cursor.create_cursor(JetMouse::CURSOR_PICTURE) if ![JetMouse::CURSOR_PICTURE,
+        JetMouse::ICON_INDEX].include?($cursor.current_cursor)
+      return
+    end
+    $cursor.create_cursor(JetMouse::CURSOR_PICTURE) if $game_temp.did_mouse_change.nil? && 
+      ![JetMouse::CURSOR_PICTURE, JetMouse::ICON_INDEX].include?($cursor.current_cursor)
+    $game_temp.did_mouse_change = nil
+  end
+  
+  def do_closest_path_check(ev)
+    se = $game_player
+    sx = se.x - ev.x
+    sy = se.y - ev.y
+    if sx != 0 or sy != 0
+      if sx.abs >= sy.abs
+        if sx >= 0
+          if $game_map.passable?(ev.x + 1, ev.y)
+            return [ev.x + 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x + 1, ev.y, false, 0, se).empty?
+          end
+          if sy >= 0
+            if $game_map.passable?(ev.x, ev.y + 1)
+              return [ev.x, ev.y + 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y + 1, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x, ev.y - 1)
+              return [ev.x, ev.y - 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y - 1, false, 0, se).empty?
+            end
+          end
+          if $game_map.passable?(ev.x - 1, ev.y)
+            return [ev.x - 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x - 1, ev.y, false, 0, se).empty?
+          end
+          if sy < 0
+            if $game_map.passable?(ev.x, ev.y + 1)
+              return [ev.x, ev.y + 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y + 1, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x, ev.y - 1)
+              return [ev.x, ev.y - 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y - 1, false, 0, se).empty?
+            end
+          end
+        elsif sx < 0
+          if $game_map.passable?(ev.x - 1, ev.y)
+            return [ev.x - 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x - 1, ev.y, false, 0, se).empty?
+          end
+          if sy >= 0
+            if $game_map.passable?(ev.x, ev.y + 1)
+              return [ev.x, ev.y + 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y + 1, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x, ev.y - 1)
+              return [ev.x, ev.y - 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y - 1, false, 0, se).empty?
+            end
+          end
+          if $game_map.passable?(ev.x + 1, ev.y)
+            return [ev.x + 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x + 1, ev.y, false, 0, se).empty?
+          end
+          if sy < 0
+            if $game_map.passable?(ev.x, ev.y + 1)
+              return [ev.x, ev.y + 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y + 1, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x, ev.y - 1)
+              return [ev.x, ev.y - 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y - 1, false, 0, se).empty?
+            end
+          end
+        end
+      else
+        if sy > 0
+          if $game_map.passable?(ev.x, ev.y + 1)
+            return [ev.x, ev.y + 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y + 1, false, 0, se).empty?
+          end
+          if sx >= 0
+            if $game_map.passable?(ev.x + 1, ev.y)
+              return [ev.x + 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x + 1, ev.y, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x - 1, ev.y)
+              return [ev.x - 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x - 1, ev.y, false, 0, se).empty?
+            end
+          end
+          if $game_map.passable?(ev.x, ev.y - 1)
+            return [ev.x, ev.y - 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y - 1, false, 0, se).empty?
+          end
+          if sx < 0
+            if $game_map.passable?(ev.x + 1, ev.y)
+              return [ev.x + 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x + 1, ev.y, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x - 1, ev.y)
+              return [ev.x - 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x - 1, ev.y, false, 0, se).empty?
+            end
+          end
+        elsif sy < 0
+          if $game_map.passable?(ev.x, ev.y - 1)
+            return [ev.x, ev.y - 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y - 1, false, 0, se).empty?
+          end
+          if sx >= 0
+            if $game_map.passable?(ev.x + 1, ev.y)
+              return [ev.x + 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x + 1, ev.y, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x - 1, ev.y)
+              return [ev.x - 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x - 1, ev.y, false, 0, se).empty?
+            end
+          end
+          if $game_map.passable?(ev.x, ev.y + 1)
+            return [ev.x, ev.y + 1] unless $game_map.find_path(se.x, se.y,
+              ev.x, ev.y + 1, false, 0, se).empty?
+          end
+          if sx < 0
+            if $game_map.passable?(ev.x + 1, ev.y)
+              return [ev.x + 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x + 1, ev.y, false, 0, se).empty?
+            end
+          else
+            if $game_map.passable?(ev.x - 1, ev.y)
+              return [ev.x - 1, ev.y] unless $game_map.find_path(se.x, se.y,
+              ev.x - 1, ev.y, false, 0, se).empty?
+            end
+          end
+        end
+      end
+    end
+    return false
+  end
+
+  def update_mouse_left_click
+    return if $game_map.interpreter.running? || $game_player.transfer?
+    if Mouse.click?(1)
+      event_activated = false
+      for event in $game_map.events_xy(*Mouse.true_grid)
+        if event.check_for_comment(/MOUSE CLICK/i)
+          event.start
+          event_activated = true
+        elsif (event.x - $game_player.x).abs + (event.y - $game_player.y).abs == 1
+          if ![3, 4].include?(event.trigger) && 
+                (![0, 2].include?(event.priority_type) || event.trigger == 0) &&
+                  ![0, 1].include?(event.page.list.size)
+            if (event.y - $game_player.y).abs >
+                (event.x - $game_player.x).abs
+              if event.y - $game_player.y > 0
+                $game_player.turn_down
+              else
+                $game_player.turn_up
+              end
+            else
+              if event.x - $game_player.x > 0
+                $game_player.turn_right
+              else
+                $game_player.turn_left
+              end
+            end
+            event.start
+            event_activated = true
+            break
+          end
+        end
+        if !event_activated
+          for i in ["UP", "DOWN", "RIGHT", "LEFT"]
+            if event.check_for_comment(/MOUSE MOVE #{i}/i)
+              event_activated = true
+              case i
+              when "UP"
+                x, y = event.x, event.y - 1
+              when "DOWN"
+                x, y = event.x, event.y + 1
+              when "LEFT"
+                x, y = event.x - 1, event.y
+              when "RIGHT"
+                x, y = event.x + 1, event.y
+              end
+              break
+            end
+          end
+        end
+        if !event_activated
+          if $game_player.passable?(*Mouse.true_grid)
+            x, y = *Mouse.true_grid
+            event_activated = true
+            break
+          end
+        end
+        if !event_activated
+          q = do_closest_path_check(event)
+          if q != false
+            x, y = q[0], q[1]
+            event_activated = true
+            break
+          end
+        end
+      end
+      if !event_activated
+        if $game_player.map_passable?(*Mouse.true_grid)
+          x, y = *Mouse.true_grid
+        end
+      end
+      if !x.nil?
+        $game_temp.move_because_of_mouse = true
+        g = $game_player.find_mouse_path(x, y)
+        $game_temp.mouse_path = g
+      end
+    end
+  end
+end

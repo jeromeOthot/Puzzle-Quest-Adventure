@@ -1,0 +1,21 @@
+<titles>
+	<title>
+		<id>1</id>
+		<name>Mort Argentée</name>
+		<description>Il a traversé un grand nombre de champs de bataille, et en est sorti indemne. Mais il devient l'incarnation de la mort quand il devient un berserker.</description>
+		<params>
+			<patk>0.4</patk>
+			<pdef>0.2</pdef>
+		</params>
+	</title>
+	<title>
+		<id>2</id>
+		<name>Poing foudroyant</name>
+		<description>Heritière d'une grand lignée, elle maîtrise les arts martiaux. Elle est même capable d'utiliser les techniques de ki.</description>
+		<params>
+			<hp>0.1</hp>
+			<patk>0.1</patk>
+			<agi>0.1</agi>
+		</params>
+	</title>
+</titles>

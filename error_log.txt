@@ -1,0 +1,11 @@
+#Window_ItemDescription:54:in `draw_bonus': undefined method `defense' for #<RPG::Armor:0x4e0b5c4>, NoMethodError
+	from #Window_ItemDescription:15:in `initialize'
+	from ->Equipment Mouse:200:in `new'
+	from ->Equipment Mouse:200:in `checkClickHoverEnemyEquipment'
+	from #Scene_Combat:462:in `checkClickHover'
+	from #Scene_Combat:135:in `update_basic'
+	from Scene_Base:41:in `update'
+	from #Scene_Combat:629:in `update'
+	from Scene_Base:14:in `main'
+	from SceneManager:24:in `run'
+	from Main:19:in `block in eval'

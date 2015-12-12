@@ -1,0 +1,8 @@
+x x x x x x x x
+x x o x x x x x
+x x l o x x x x
+x x l v s x x x
+x v e l v x x x
+x t l t l x x x
+x o t e s x x x
+x e l l s x x x
