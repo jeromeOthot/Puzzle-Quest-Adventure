@@ -1,8 +1,8 @@
 ############################################################################
-#                  Classe qui crée les gemme selon le type
+#                  Classe qui crï¿½e les gemme selon le type
 ############################################################################
 class Gems_Factory
-  
+
   def create_gem(type, x, y)
      case type
      when 0
@@ -22,15 +22,25 @@ class Gems_Factory
      when 7
        Ice_Gem.new(x, y)
      when 8
+       Dark_Gem.new(x, y)
+     when 9
        Thunder_Gem.new(x, y)
      when 10
-       Skull_Gem.new(x, y)
+       Dragon_Gem.new(x, y)
      when 11
-       Skull5_Gem.new(x, y)
+       Poison_Gem.new(x, y)
      when 12
-       Skull10_Gem.new(x, y)
+       Flying_Gem.new(x, y)
      when 13
-       Skull20_Gem.new(x, y)
+       Bug_Gem.new(x, y)
+     when 14
+       Ground_Gem.new(x, y)
+     when 15
+       Rock_Gem.new(x, y)
+     when 16
+       Frozen_Gem.new(x, y)
+     when 17
+       Ghost_Gem.new(x, y)
      when 20
        Multi_Gem.new(x, y, 2)
      when 21

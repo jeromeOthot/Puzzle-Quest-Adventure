@@ -1,8 +1,8 @@
 #==============================================================================
 #  Game_Chrono
 #------------------------------------------------------------------------------
-#  Class permettant de faire la gestion d'un chronomètre, ou on part de 0 sec
-#  et le temps incrémente jusqu'a se qu'on l'arrête. Contraire de Game_Timer
+#  Class permettant de faire la gestion d'un chronomï¿½tre, ou on part de 0 sec
+#  et le temps incrï¿½mente jusqu'a se qu'on l'arrï¿½te. Contraire de Game_Timer
 #==============================================================================
 
 class Game_Chrono
@@ -11,6 +11,8 @@ class Game_Chrono
   #--------------------------------------------------------------------------
   def initialize
     @count = 0
+    @secondes = 0
+    @minutes = 0
     @working = false
   end
   #--------------------------------------------------------------------------
@@ -18,6 +20,19 @@ class Game_Chrono
   #--------------------------------------------------------------------------
   def update
       @count += 1
+      
+      
+      if( @count % 60 == 0 )
+        @secondes += 1
+        
+        if( @secondes % 60 == 0 )
+             @secondes = 0
+             @minutes += 1
+        end
+      end
+     
+      
+      
   end
   #--------------------------------------------------------------------------
   #  Start
@@ -48,13 +63,13 @@ class Game_Chrono
   #  Get Seconds
   #--------------------------------------------------------------------------
   def sec
-    return 60 #(@count  Graphics.frame_rate) % 60
+    return @secondes
   end
   
   #--------------------------------------------------------------------------
   #  Get Seconds
   #--------------------------------------------------------------------------
   def min
-    return 60 #(@count  Graphics.frame_rate) %  60
+    return @minutes
   end
 end

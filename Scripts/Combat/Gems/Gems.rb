@@ -1,5 +1,5 @@
 ############################################################################
-#                  Classe qui défini un gem en général
+#                  Classe qui dï¿½fini un gem en gï¿½nï¿½ral
 ############################################################################
 class Gems
   attr_accessor   :viewport
@@ -8,20 +8,20 @@ class Gems
   attr_accessor   :boardY
   attr_accessor   :posX
   attr_accessor   :posY
-  
-  
+
+
   PADDING = 12
-  
+
   GEM_SKULL_MIN = 10
   GEM_SKULL_MAX = 14
   GEM_MULTI_X2 = 20
   GEM_MULTI_X8 = 26
-  
+
   FIRE_GEM  = 1
   WATER_GEM = 2
   EARTH_GEM = 3
   WIND_GEM  = 4
-  
+
   def initialize( type, x, y)
      @type = type
      @posX = x
@@ -35,7 +35,7 @@ class Gems
      @isMatching = false
      @viewport = nil
   end
-  
+
   def getSprite()
     if( @viewport == nil )
         @viewport = Viewport.new(150 + PADDING, 165 + PADDING, 270, 250)
@@ -43,50 +43,50 @@ class Gems
     @viewport.z = 100
     return Sprite_Movement.new( @bitmapGem, getPosX, getPosY, @viewport)
   end
-  
+
   def matching?() return @isMatching end
   def setMatching(isMatch) @isMatching = isMatch end
-   
+
   def setPosX(x)  @posX = x end
-  def setPosY(y)  @posY = y end  
-   
+  def setPosY(y)  @posY = y end
+
   def getPosX() return @posX end
-  def getPosY() return @posY end  
-  
+  def getPosY() return @posY end
+
   def setBoardIndexX(x) @posX = (x * 27)+3 end
-  def setBoardIndexY(y) @posY = (y * 27)+3 end    
-    
+  def setBoardIndexY(y) @posY = (y * 27)+3 end
+
   def getBoardIndexX() return (@posX / 27) end
-  def getBoardIndexY() return (@posY / 27) end   
-    
+  def getBoardIndexY() return (@posY / 27) end
+
   def getType() return @type end
   def setType(type) @type = type end
 
   def doEffect() end
-    
+
   def draw_icon()
-    @bitmapGem = Cache.picture("gemmes/gemme_" + getType().to_s)
+    @bitmapGem = Cache.picture("Energies/energy_" + getType().to_s)
     @sprite = getSprite()
     @sprite.visible
     @sprite.z = 100
   end
-  
+
   def setOpacity(opacity)
     @sprite.opacity = opacity  unless @sprite == nil
   end
-  
+
   def clear_icon()
     if( @sprite != nil )
       @sprite.dispose
     end
 
   end
-  
+
   def getIdIcon()
     return @idIcon
   end
-  
-  #Détermine si le gem est de type void
+
+  #Dï¿½termine si le gem est de type void
   def voidGem?()
     if( self != nil )
       if( self.getType() == 0 )
@@ -96,27 +96,27 @@ class Gems
       return false
     end
   end
-  
+
   def gemMulti?()
     return ( self.getType() >= GEM_MULTI_X2 && self.getType() <= GEM_MULTI_X8 )
   end
-  
+
   def gemElemental?()
-    return ( self.getType() == FIRE_GEM  || 
+    return ( self.getType() == FIRE_GEM  ||
              self.getType() == WATER_GEM ||
-             self.getType() == EARTH_GEM  || 
-             self.getType() == WIND_GEM 
+             self.getType() == EARTH_GEM  ||
+             self.getType() == WIND_GEM
            )
   end
-  
-  #Opérateur == 
-  def == (other); 
+
+  #Opï¿½rateur ==
+  def == (other);
     if(self && other)
-      #On vérifie que tous les gems Multi sont identique à la comparaison
+      #On vï¿½rifie que tous les gems Multi sont identique ï¿½ la comparaison
       if( self.type >= GEM_MULTI_X2 && self.type <= GEM_MULTI_X8 && other.type >= GEM_MULTI_X2 && other.type <= GEM_MULTI_X8 )
          return true
       else
-        #On indique que tous les types de skulls sont identique à la comparaison
+        #On indique que tous les types de skulls sont identique ï¿½ la comparaison
         if( self.type >= GEM_SKULL_MIN  && self.type <= GEM_SKULL_MAX && other.type >= GEM_SKULL_MIN  && other.type <= GEM_SKULL_MAX )
           return true
         else
@@ -124,23 +124,23 @@ class Gems
         end
       end
     end
-  end 
-  
-  #TODO: Arrangé cet opérateur qui fonctionne pas
-  #Opérateur != 
-#~   def != (other); 
+  end
+
+  #TODO: Arrangï¿½ cet opï¿½rateur qui fonctionne pas
+  #Opï¿½rateur !=
+#~   def != (other);
 #~     if(self && other)
-#~       self.getIdIcon() != other.getIdIcon() 
+#~       self.getIdIcon() != other.getIdIcon()
 #~     end
-#~   end 
-end    
+#~   end
+end
 
 class Void_Gem < Gems
   def initialize(x, y)
      super( 0, x, y)
     # puts("fire")
   end
-  
+
   def doEffect()
 #~     puts("fireEffect: " + @actor.fire_magic )
 #~     fireMana = @actor.fire_magic.to_i
@@ -154,23 +154,23 @@ class Fire_Gem < Gems
      super( 1, x, y)
     # puts("fire")
   end
-  
+
   def doEffect()
     puts("fireEffect: " + @actor.fire_magic )
     fireMana = @actor.fire_magic.to_i
     fireMana += 1
     @actor.setFire_magic( fireMana.to_s )
   end
-  
+
  end
 
- 
+
 class Water_Gem < Gems
   def initialize(x, y)
       super( 2, x, y)
      #puts("water")
    end
-   
+
   def doEffect()
     puts("WaterEffect: " + @actor.water_magic )
     waterMana = @actor.water_magic.to_i
@@ -178,13 +178,13 @@ class Water_Gem < Gems
     @actor.setWater_magic( waterMana.to_s )
   end
 end
- 
+
 class Earth_Gem < Gems
   def initialize(x, y)
      super( 3, x, y)
      #puts("earth")
    end
-   
+
   def doEffect()
     puts("EarthEffect: " + @actor.earth_magic )
     earthMana = @actor.earth_magic.to_i
@@ -192,13 +192,13 @@ class Earth_Gem < Gems
     @actor.setEarth_magic( earthMana.to_s )
   end
 end
- 
+
 class Wind_Gem < Gems
   def initialize(x, y)
      super( 4, x, y)
      #puts("wind")
    end
-   
+
   def doEffect()
     puts("WindEffect: " + @actor.wind_magic )
     windMana = @actor.wind_magic.to_i
@@ -209,9 +209,9 @@ end
 
 class Gold_Gem < Gems
    def initialize(x, y)
-     super( 5, x, y)     
+     super( 5, x, y)
    end
-   
+
   def doEffect()
      lightMana = @actor.light_magic.to_i
      lightMana += 1
@@ -221,9 +221,9 @@ end
 
 class Exp_Gem < Gems
    def initialize(x, y)
-     super( 6, x, y)     
+     super( 6, x, y)
    end
-   
+
   def doEffect()
      lightMana = @actor.light_magic.to_i
      lightMana += 1
@@ -233,9 +233,9 @@ end
 
 #~ class Light_Gem < Gems
 #~   def initialize(x, y)
-#~      super(7616, 9, x, y)     
+#~      super(7616, 9, x, y)
 #~    end
-#~    
+#~
 #~   def doEffect()
 #~      puts("LightEffect: " + @actor.light_magic )
 #~      lightMana = @actor.light_magic.to_i
@@ -243,13 +243,13 @@ end
 #~      @actor.setLight_magic( lightMana.to_s )
 #~   end
 #~ end
-#~  
+#~
 #~ class Dark_Gem < Gems
 #~   def initialize(x, y)
 #~      super(7943, 10, x, y)
 #~      #puts("Dark")
 #~    end
-#~    
+#~
 #~   def doEffect()
 #~      puts("DarkEffect: " + @actor.dark_magic )
 #~     # darkMana = @actor.dark_magic.to_i
@@ -263,22 +263,22 @@ class Skull_Gem < Gems
      super( 10, x, y)
      #puts("skull")
    end
-   
+
   def doEffect()
      @enemy.setHP( @enemy.hp - 1 )
   end
 end
- 
+
 class Skull5_Gem < Gems
   def initialize(x, y)
      super( 11, x, y)
      #puts("skull5")
    end
-   
+
   def doEffect()
      @enemy.setHP( @enemy.hp - 5 )
   end
-end 
+end
 
 #Gem seulement dispo enemy lv 15
 class Skull10_Gem < Gems
@@ -286,7 +286,7 @@ class Skull10_Gem < Gems
      super(12, x, y)
      #puts("skull")
    end
-   
+
   def doEffect()
      @enemy.setHP( @enemy.hp - 1 )
   end
@@ -298,11 +298,13 @@ class Skull20_Gem < Gems
      super(13, x, y)
      #puts("skull5")
    end
-   
+
   def doEffect()
      @enemy.setHP( @enemy.hp - 5 )
   end
-end 
+end
+
+
 
 
 #~ class Attack_Gem < Gems
@@ -310,7 +312,7 @@ end
 #~      super(7929, 9, x, y)
 #~      #puts("attack")
 #~    end
-#~    
+#~
 #~   def doEffect()
 #~      puts("AttackEffect: " + @actor.points_attack.to_s )
 #~      ptsAttack = @actor.points_attack.to_i
@@ -318,7 +320,7 @@ end
 #~      @actor.setPoints_attack(ptsAttack)
 #~   end
 #~ end
- 
+
 class Multi_Gem < Gems
   def initialize(x, y, multi)
      @Multi = multi
@@ -334,14 +336,109 @@ class Ice_Gem < Gems
      #puts("ice")
    end
  end
- 
+
 class Thunder_Gem < Gems
   def initialize(x, y)
      super(8, x, y)
       #puts("thunder")
    end
- end 
- 
+ end
+
+ class Dark_Gem < Gems
+   def initialize(x, y)
+      super(9, x, y)
+      #puts("Dark")
+    end
+
+   def doEffect()
+      puts("DarkEffect: " + @actor.dark_magic )
+     # darkMana = @actor.dark_magic.to_i
+     #darkMana += 1
+      #@actor.setDark_magic( darkMana.to_s )
+   end
+end
+   # POKEMON GEM juste pour voir ca donne quoi
+   class Dragon_Gem < Gems
+     def initialize(x, y)
+        super(10, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+   end
+
+   class Poison_Gem < Gems
+     def initialize(x, y)
+        super(11, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+   end
+
+   class Flying_Gem < Gems
+     def initialize(x, y)
+        super(12, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+   end
+
+   class Bug_Gem < Gems
+     def initialize(x, y)
+        super(13, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+   end
+
+   class Ground_Gem < Gems
+     def initialize(x, y)
+        super(14, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+    end
+
+
+   class Rock_Gem < Gems
+     def initialize(x, y)
+        super(15, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+   end
+
+   class Frozen_Gem < Gems
+     def initialize(x, y)
+        super(16, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+    end
+
+   class Ghost_Gem < Gems
+     def initialize(x, y)
+        super(17, x, y)
+        #puts("Dark")
+      end
+
+     def doEffect()
+     end
+end
+
  class Unknow_Gem < Gems
   def initialize(x, y)
      super(100, x, y)
