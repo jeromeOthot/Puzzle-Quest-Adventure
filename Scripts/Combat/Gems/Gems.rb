@@ -65,7 +65,7 @@ class Gems
   def doEffect() end
 
   def draw_icon()
-    @bitmapGem = Cache.picture("Energies/energy_" + getType().to_s)
+    @bitmapGem = Cache.picture("Gems/gem_" + getType().to_s)
     @sprite = getSprite()
     @sprite.visible
     @sprite.z = 100
