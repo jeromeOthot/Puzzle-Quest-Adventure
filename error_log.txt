@@ -1,12 +1,8 @@
-C:/Puzzle-Quest-Adventure/Scripts/Menu/Window_Stats.rb:119:in `initialize': No such file or directory - Graphics/Pictures/magie_mini1, Errno::ENOENT
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Window_Stats.rb:119:in `new'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Window_Stats.rb:119:in `draw_magicIcon'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Window_Stats.rb:68:in `draw_magicPoints'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Window_Stats.rb:24:in `refresh'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Window_Stats.rb:13:in `initialize'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Scene_Inventory.rb:22:in `new'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Scene_Inventory.rb:22:in `create_status_window'
-	from C:/Puzzle-Quest-Adventure/Scripts/Menu/Scene_Inventory.rb:14:in `start'
-	from C:/Puzzle-Quest-Adventure/Scripts/RMVXAce Scripts/Scene/Scene_Base.rb:12:in `main'
+C:/Puzzle-Quest-Adventure/Scripts/Mouse/Puzzle/PuzzleBoard_Mouse.rb:48:in `checkLeftClickOnBoard': undefined method `draw_firstCursor' for nil:NilClass, NoMethodError
+	from C:/Puzzle-Quest-Adventure/Scripts/Puzzle/Scenes/Scene_Puzzle.rb:273:in `checkLeftClick'
+	from C:/Puzzle-Quest-Adventure/Scripts/Puzzle/Scenes/Scene_Puzzle.rb:97:in `update_basic'
+	from C:/Puzzle-Quest-Adventure/Scripts/RMVXAce Scripts/Scene/Scene_Base.rb:41:in `update'
+	from C:/Puzzle-Quest-Adventure/Scripts/Puzzle/Scenes/Scene_Puzzle.rb:510:in `update'
+	from C:/Puzzle-Quest-Adventure/Scripts/RMVXAce Scripts/Scene/Scene_Base.rb:14:in `main'
 	from C:/Puzzle-Quest-Adventure/Scripts/RMVXAce Scripts/Module/SceneManager.rb:24:in `run'
 	from C:/Puzzle-Quest-Adventure/Scripts/RMVXAce Scripts/Main/Main.rb:19:in `block in <top (required)>'

@@ -24,17 +24,17 @@ class Window_HeroSkills < Window_Base
       end
 
       if(@skill.water_cost.to_i  > 0)
-        draw_magicIcon(50, 14, 3)
+        draw_magicIcon(50, 14, 2)
         draw_text( 63,14, 15, 14, @skill.water_cost)
       end
 
       if(@skill.earth_cost.to_i  > 0)
-        draw_magicIcon(90, 14, 4)
+        draw_magicIcon(90, 14, 3)
         draw_text(103, 14, 15, 14, @skill.earth_cost)
       end
 
       if(@skill.wind_cost.to_i  > 0)
-         draw_magicIcon(140, 14, 5)
+         draw_magicIcon(140, 14, 4)
          draw_text( 153, 14, 15, 14, @skill.wind_cost)
       end
     elsif ( @skill.isOverLimit )
@@ -45,8 +45,8 @@ class Window_HeroSkills < Window_Base
   end
 
    def draw_magicIcon(x, y, type)
-    #bitmap_heroFace = Bitmap.new("Graphics/Pictures/gemmes/magie_mini" + type.to_s)
-    #self.contents.blt(x, y, bitmap_heroFace, Rect.new(0, 0, 12, 12))
+    bitmap_heroFace = Bitmap.new("Graphics/Pictures/Gems/magie_mini" + type.to_s)
+    self.contents.blt(x, y, bitmap_heroFace, Rect.new(0, 0, 12, 12))
   end
 
    def draw_icon(icon_index, x, y, enabled = true)
