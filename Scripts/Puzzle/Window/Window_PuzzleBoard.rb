@@ -2,7 +2,7 @@ class Window_PuzzleBoard < Window_Base
 
   NORMAL_BOARD_GRID_WIDTH = 8
   SKILLS_BOARD_GRID_WIDTH = 10
-  
+
   BOARD_START_X = 209
   BOARD_START_Y = 182
 
@@ -22,20 +22,6 @@ class Window_PuzzleBoard < Window_Base
   #--------------------------------------------------------------------------
   # * mutateur et accesseurs
   #--------------------------------------------------------------------------
-
-#~   def setFirstCursorPosX(x)  @firstCursorPosX = x end
-#~   def setFirstCursorPosY(y)  @firstCursorPosY = y end
-#~   def setSecondCursorPosX(x)  @secondCursorPosX = x end
-#~   def setSecondCursorPosY(y)  @secondCursorPosY = y end
-#~   def setFirstCursorIndex(index) @firstCursorIndex = index end
-#~   def setSecondCursorIndex(index)@secondCursorIndex = index end
-#~
-#~   def getFirstCursorPosX()   return @firstCursorPosX  end
-#~   def getFirstCursorPosY()   return @firstCursorPosY  end
-#~   def getSecondCursorPosX()  return @secondCursorPosX end
-#~   def getSecondCursorPosY()  return @secondCursorPosY end
-#~   def getFirstCursorIndex()  return @firstCursorIndex end
-#~   def getSecondCursorIndex() return @secondCursorIndex end
 
   def create_cursor
     @cursorSprite1 = Sprite.new
@@ -93,21 +79,12 @@ class Window_PuzzleBoard < Window_Base
  end
 
   def draw_firstCursor(x, y)
-    #clear_cursor(x, y)
-    #@bitmap_gameCursor.clear if @bitmap_gameCursor
-    #bitmap_gameCursor = Bitmap.new("Graphics/Pictures/curseur1")
-    #@window_gameBoard.contents.blt(x, y, bitmap_gameCursor, Rect.new(0, 0, 30, 30))
-    #@gameBattle.clearBoard()
-    #clear_cursor(x, y)
-#~      viewport1 = @window_gameBoard.viewport.new()
-
       @cursorSprite1.visible = true unless @cursorSprite1.visible
       @cursorSprite1.x = x + BOARD_START_X
       @cursorSprite1.y = y + BOARD_START_Y
   end
 
   def draw_secondCursor(x, y)
-      puts( "Draw 2nd cursor!!!")
       @cursorSprite2.visible = true unless @cursorSprite2.visible
       @cursorSprite2.x =  x + self.x  + standard_padding + 1
       @cursorSprite2.y =  y + self.y  + standard_padding + 5

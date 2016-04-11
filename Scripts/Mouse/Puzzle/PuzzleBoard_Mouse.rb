@@ -34,25 +34,55 @@ GAMEBOARD_POS_Y = 182
   end
 
   def checkLeftClickOnBoard()
-      @window_puzzleConsole.set_text("On click: " + ($cursor.x.to_i).to_s + " --- " + ($cursor.y.to_i).to_s)
+      #@window_puzzleConsole.set_text("On click: " + ($cursor.x.to_i).to_s + " --- " + ($cursor.y.to_i).to_s)
       #Si la position du click est sur le board
       if($cursor.x.to_i >= GAMEBOARD_POS_X && $cursor.x.to_i <= ( GAMEBOARD_POS_X + 216 ) && $cursor.y.to_i >= GAMEBOARD_POS_Y && $cursor.y.to_i <= ( GAMEBOARD_POS_Y + 216 ))
 
           x = (($cursor.x.to_i - GAMEBOARD_POS_X) / 27).to_i
           y = (($cursor.y.to_i - GAMEBOARD_POS_Y) / 27).to_i
 
-          @window_puzzleConsole.set_text("click OK !")
           #On v�rifie si c'est un 2e click
           if(@isSecondClick == false)
+          #  @window_puzzleConsole.set_text("1st click: " + x.to_s + ":" + y.to_s)
             @isSecondClick = true
             @window_puzzleBoard.draw_firstCursor(x * 27, y * 27)
+            @firstCursorPosX = x
+            @firstCursorPosY = y
             return 0
           else
+            @isSecondClick = false
+          #  @window_puzzleConsole.set_text("2e click: " + x.to_s + ":" + y.to_s)
             @window_puzzleBoard.draw_secondCursor(x * 27, y * 27)
-            @window_puzzleConsole.set_text("second click OK !")
+          #  @window_puzzleConsole.set_text("second click OK !")
             #On check si l'utilisateur reclic sur le 1er curseur
             if( secondCursorCorrect?(x, y) )
               @window_puzzleConsole.set_text("second cursor OK !")
+              #si le 2e gem est NULL ca veut dire que la pos du 2e cursor est pas bonne
+              #@window_puzzleConsole.set_text(@firstGem.to_s + " " + @secondGem.to_s)
+              if( @secondGem != nil )
+
+                @isSecondClick = false
+                #** directionSwitchGems = @gameBattle.checkGemMove(@firstGem, @secondGem)
+
+                #?refresh()
+                @gameBattle.inverse2gemsPosition(@firstGem, @secondGem)
+                #@window_gameBoard.refresh
+                @window_gameBoard.refreshGem(@firstGem)
+                @window_gameBoard.refreshGem(@secondGem)
+
+
+                #@window_gameBoard.refreshGem(@firstGem)
+                #@window_gameBoard.refreshGem(@secondGem)
+
+                directionSwitchGems = @gameBattle.checkGemMove(@firstGem, @secondGem)
+                clearCursors()
+                 #@gameBattle.doCascadeBoard()
+                 @window_puzzleConsole.set_text(@firstGem.to_s + " " + @secondGem.to_s)
+                return directionSwitchGems
+#~               else
+#~                 clearCursors()
+                 return 0
+              end
             else
 
             end
@@ -70,7 +100,6 @@ GAMEBOARD_POS_Y = 182
     # Le 2e cursor doit correspondre a une case alentour de la case du 1er curseur
     #--------------------------------------------------------------------------
     def secondCursorCorrect?(  posCursor2x, posCursor2y )
-
      #si la position du 2e curseur est la meme que le 1er curseur
      if( posCursor2x == @firstCursorPosX && posCursor2y == @firstCursorPosY )
        @window_puzzleConsole.set_text("reclick meme cursor !")
@@ -92,7 +121,7 @@ GAMEBOARD_POS_Y = 182
        elsif( posCursor2x == @firstCursorPosX + 1 && posCursor2y == @firstCursorPosY )
           return true
        else
-         @window_puzzleConsole.set_text("second cursor position Fail !")
+          @window_puzzleConsole.set_text("second cursor position Fail !")
           return false
        end
      end

@@ -565,6 +565,28 @@ class Game_Puzzle
       gem = @gemsFactory.create_gem(0, 50 + 27*posX, 8+27*posY)
     end
 
+    gem = nil
+    case code
+    when "x"
+      gem = @gemsFactory.create_gem(0, 50 + 27*posX, 8+27*posY)
+    when "f"
+      gem = @gemsFactory.create_gem(1, 50 + 27*posX, 8+27*posY)
+    when "w"
+      gem = @gemsFactory.create_gem(2, 50 + 27*posX, 8+27*posY)
+    when "e"
+      gem = @gemsFactory.create_gem(3, 50 + 27*posX, 8+27*posY)
+    when "a"
+      gem = @gemsFactory.create_gem(4, 50 + 27*posX, 8+27*posY)
+    when "l"
+      gem = @gemsFactory.create_gem(5, 50 + 27*posX, 8+27*posY)
+    when "i"
+      gem = @gemsFactory.create_gem(7, 50 + 27*posX, 8+27*posY)
+    when "t"
+      gem = @gemsFactory.create_gem(8, 50 + 27*posX, 8+27*posY)
+    when "d"
+      gem = @gemsFactory.create_gem(8, 50 + 27*posX, 8+27*posY)
+    end
+
     if( gem != nil )
       gem.draw_icon()
       @gridBoard[[posX,posY]] = gem

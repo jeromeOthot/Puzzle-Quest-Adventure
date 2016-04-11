@@ -1,4 +1,5 @@
-C:/Puzzle-Quest-Adventure/Scripts/Mouse/Puzzle/PuzzleBoard_Mouse.rb:48:in `checkLeftClickOnBoard': undefined method `draw_firstCursor' for nil:NilClass, NoMethodError
+C:/Puzzle-Quest-Adventure/Scripts/Mouse/Puzzle/PuzzleBoard_Mouse.rb:101:in `secondCursorCorrect?': undefined local variable or method `firstCursorPosX' for #<PuzzleBoard_Mouse:0x9a8d2bc>, NameError
+	from C:/Puzzle-Quest-Adventure/Scripts/Mouse/Puzzle/PuzzleBoard_Mouse.rb:57:in `checkLeftClickOnBoard'
 	from C:/Puzzle-Quest-Adventure/Scripts/Puzzle/Scenes/Scene_Puzzle.rb:273:in `checkLeftClick'
 	from C:/Puzzle-Quest-Adventure/Scripts/Puzzle/Scenes/Scene_Puzzle.rb:97:in `update_basic'
 	from C:/Puzzle-Quest-Adventure/Scripts/RMVXAce Scripts/Scene/Scene_Base.rb:41:in `update'
