@@ -215,8 +215,8 @@ class Game_Puzzle
     for x in 0...@gemsToRemove.size
         currentGem = @gemsToRemove[x]
         if( currentGem != nil )
-          @gridBoard[[currentGem.getBoardIndexX, currentGem.getBoardIndexY]].clear_icon(@window)
-          @gridBoard[[currentGem.getBoardIndexX, currentGem.getBoardIndexY]] = nil
+          @gridBoard[[currentGem.boardX, currentGem.boardY]].clear_icon(@window)
+          @gridBoard[[currentGem.boardX, currentGem.boardY]] = nil
         end
     end
   end
@@ -245,25 +245,38 @@ class Game_Puzzle
     isMoveValid = false
 
     #On inverse la position des 2 gems du board sans changer le board directement
-#~     tmpFirstPosX = secondGem.getBoardIndexX
-#~     tmpFirstPosY = secondGem.getBoardIndexY
-#~     tmpType = secondGem.getType
-#~
-#~     firstGem.setBoardIndexX(secondGem.getBoardIndexX)
-#~     firstGem.setBoardIndexY(secondGem.getBoardIndexY)
-#~     firstGem.setType(secondGem.getType)
-#~
-#~     secondGem.setBoardIndexX(tmpFirstPosX)
-#~     secondGem.setBoardIndexY(tmpFirstPosY)
-#~     secondGem.setType(tmpType)
+    # tmpFirstPosX = firstGem.boardX
+    # tmpFirstPosY = firstGem.boardY
+    # tmpType = firstGem.getType
 
-    #puts("gem1: " + firstGem.to_s)
-    #puts("gem2: " + secondGem.to_s)
 
-    #On check le mouvement est horizontale
-    if(firstGem.getBoardIndexY() == secondGem.getBoardIndexY())
+  #   firstGem.setBoardIndexX(secondGem.boardX)
+    # firstGem.setBoardIndexY(secondGem.boardY)
+  #   firstGem.setType(secondGem.getType)
+
+  #   secondGem.setBoardIndexX(tmpFirstPosX)
+  #   secondGem.setBoardIndexY(tmpFirstPosY)
+  #   secondGem.setType(tmpType)
+
+    puts("BEFORE: " )
+    puts("gem1: " +   @gridBoard[[2, 7]].to_s)
+    puts("gem2: " +   @gridBoard[[3, 7]].to_s)
+    inverse2gemsPosition(firstGem.boardX, firstGem.boardY, secondGem.boardX, secondGem.boardY)
+     #tmpGem = firstGem
+     #firstGem = secondGem
+     #secondGem = tmpGem
+     refreshBoard()
+
+     puts("AFTER: " )
+     puts("gem1: " +   @gridBoard[[2, 7]].to_s)
+     puts("gem2: " +   @gridBoard[[3, 7]].to_s)
+
+
+
+    #On check si le mouvement est horizontale
+    if(firstGem.boardY == secondGem.boardY)
       isMoveValid = checkHorizontalGemMove( firstGem, secondGem)
-    #On check le  mouvement est vertical
+    #On check si le  mouvement est vertical
     else
       isMoveValid = checkVerticalGemMove(firstGem, secondGem)
     end
@@ -277,18 +290,18 @@ class Game_Puzzle
   def getDirectionSwitchGems(firstGem, secondGem)
     if( firstGem != nil && secondGem != nil )
       # -->
-      if( firstGem.getPosX() < secondGem.getPosX() )
+      if( firstGem.posX() < secondGem.posX() )
         direction = 1
       # <--
-      elsif( firstGem.getPosX() > secondGem.getPosX() )
+      elsif( firstGem.posX() > secondGem.posX() )
         direction = 2
       # |
       # v
-      elsif( firstGem.getPosY() < secondGem.getPosY() )
+      elsif( firstGem.posY() < secondGem.posY() )
         direction = 3
       # ^
       # |
-      elsif( firstGem.getPosY() > secondGem.getPosY() )
+      elsif( firstGem.posY() > secondGem.posY() )
         direction = 4
       else
         direction = 0
@@ -311,8 +324,15 @@ class Game_Puzzle
          secGem = @gridBoard[[posSecondX, posSecondY]]
 
           if( fisGem != nil && secGem != nil)
-            @gridBoard[[posFirstX, posFirstY]] = @gemsFactory.create_gem(secGem.getType(), fisGem.getPosX, fisGem.getPosY)
-            @gridBoard[[posSecondX, posSecondY]] = @gemsFactory.create_gem(fisGem.getType(), secGem.getPosX, secGem.getPosY)
+            tmpGem = fisGem
+            #@gridBoard[[posFirstX, posFirstY]] = @gemsFactory.create_gem(secGem.getType(), fisGem.posX, fisGem.posY)
+            #@gridBoard[[posSecondX, posSecondY]] = @gemsFactory.create_gem(fisGem.getType(), secGem.posX, secGem.posY)
+            @gridBoard[[posFirstX, posFirstY]] = secGem
+            @gridBoard[[posSecondX, posSecondY]] = fisGem
+            puts("AFTER: " + posFirstX.to_s + " " + posFirstY.to_s + " " + posSecondX.to_s + " " + posSecondY.to_s + " " )
+            puts("gem1: " +   @gridBoard[[posFirstX, posFirstY]] .to_s)
+            puts("gem2: " +   @gridBoard[[posSecondX, posSecondY]].to_s)
+
           elsif( fisGem != nil && secGem == nil)
               @gridBoard[[posSecondX, posSecondY]] = nil
           elsif( secGem != nil && fisGem == nil)
@@ -409,11 +429,11 @@ class Game_Puzzle
 
     #if( currentGem.voidGem? )
       if( secondCurrentGem != nil )
-        indexX = secondCurrentGem.getBoardIndexX()
-        indexY = secondCurrentGem.getBoardIndexY()
+        indexX = secondCurrentGem.boardX()
+        indexY = secondCurrentGem.boardY()
       else
-        indexX = currentGem.getBoardIndexX()
-        indexY = currentGem.getBoardIndexY()
+        indexX = currentGem.boardX()
+        indexY = currentGem.boardY()
       end
 
       length = 0
@@ -447,11 +467,11 @@ class Game_Puzzle
 
     #if( currentGem.voidGem? )
       if( secondCurrentGem != nil )
-        indexX = secondCurrentGem.getBoardIndexX()
-        indexY = secondCurrentGem.getBoardIndexY()
+        indexX = secondCurrentGem.boardX()
+        indexY = secondCurrentGem.boardY()
       else
-        indexX = currentGem.getBoardIndexX()
-        indexY = currentGem.getBoardIndexY()
+        indexX = currentGem.boardX()
+        indexY = currentGem.boardY()
       end
 
       length = 0
@@ -483,8 +503,8 @@ class Game_Puzzle
     for i in startX...finishX + 1
       for j in startY...finishY + 1
         if( @gridBoard[[i, j]] != nil )
-          @gridBoard[[i, j]].setMatching(true)
-          #puts("setMatching: " + i.to_s + " : " + j.to_s )
+          @gridBoard[[i, j]].isMatching = true
+          puts("setMatching: " + i.to_s + " : " + j.to_s )
         end
       end
     end
@@ -498,11 +518,11 @@ class Game_Puzzle
     for i in 0..BOARD_MAX_X
       for j in 0..BOARD_MAX_Y
         if( @gridBoard[[i, j]] != nil && @gridBoard[[i, j]].matching? )
-          #puts("setMatching: " + i.to_s + " : " + j.to_s )
-#~           @gridBoard[[i, j]].clear_icon()
-#~           @gridBoard[[i, j]] = nil
-          @gridBoard[[i, j]].doEffect()
-          @gridBoard[[i, j]].setType(0)
+           #puts("setMatching: " + i.to_s + " : " + j.to_s )
+           @gridBoard[[i, j]].clear_icon()
+        #   @gridBoard[[i, j]] = nil
+        #  @gridBoard[[i, j]].doEffect()
+          @gridBoard[[i, j]].type = 0
         end
       end
     end
@@ -613,7 +633,7 @@ class Game_Puzzle
                k += 1
              end
              if( @gridBoard[[x, y-k]] != nil )
-               inverse2gemsPosition(x, y, @gridBoard[[x, y-k]].getBoardIndexX, @gridBoard[[x, y-k]].getBoardIndexY)
+               inverse2gemsPosition(x, y, @gridBoard[[x, y-k]].boardX, @gridBoard[[x, y-k]].boardY)
 
 #~                if( checkCascadeCombinaison( x, y ) )
 #~                  doCascadeBoard()
@@ -658,28 +678,28 @@ class Game_Puzzle
 #~             #if( j != 0 )
 #~                gem = @gridBoard[[x, j]]
 #~                puts("gem:" + gem.to_s )
-#~                gem.setPosY( gem.getPosY()+27 )
+#~                gem.posY( gem.posY()+27 )
 #~                gem.draw_icon(@window)
 #~                @gridBoard[[x, j+1]] = gem
 #~              #else
-#~                #gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].getPosX(), @gridBoard[[x, 0]].getPosY())
+#~                #gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].posX(), @gridBoard[[x, 0]].posY())
 #~                #gem.draw_icon(@window)
 #~                #@gridBoard[[x, 0]] = gem
 #~             #end
 #~             j -= 1
 #~           end
 #~
-#~           gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].getPosX(), 3)
+#~           gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].posX(), 3)
 #~           gem.draw_icon(@window)
 #~           @gridBoard[[x, 0]] = gem
 #~
 #~       gemBas = @gridBoard[[x, y-1]]
-#~       #gemHaut = @gemsFactory.create_gem(100, gemBas.getPosX(), gemBas.getPosY())
-#~       gemHaut = @gemsFactory.create_gem(100, gemBas.getPosX(), gemBas.getPosY())
+#~       #gemHaut = @gemsFactory.create_gem(100, gemBas.posX(), gemBas.posY())
+#~       gemHaut = @gemsFactory.create_gem(100, gemBas.posX(), gemBas.posY())
 #~
-#~       gemBas.setPosY( gemHaut.getPosY()+27 )
+#~       gemBas.posY( gemHaut.posY()+27 )
 #~       gemBas.draw_icon(@window)
-#~       #gemBas.setPosY( gemHaut.getPosY() )
+#~       #gemBas.posY( gemHaut.posY() )
 #~       gemHaut.draw_icon(@window)
 #~
 #~
@@ -695,7 +715,7 @@ class Game_Puzzle
 #~       j = y - 2
 #~       while j >= 0
 #~         if( @gridBoard[[x, j]] != gemRandom )
-#~             gemHaut = #@gemsFactory.create_gem(100, @gridBoard[[x, j]].getPosX(), @gridBoard[[x, j]].getPosY())
+#~             gemHaut = #@gemsFactory.create_gem(100, @gridBoard[[x, j]].posX(), @gridBoard[[x, j]].posY())
 #~             @gridBoard[[x, j]] = gemHaut
 #~             gemHaut.draw_icon(@window)
 #~          else
@@ -706,7 +726,7 @@ class Game_Puzzle
 
 #~       if( j != 0 )
 #~         gem = @gridBoard[[x, y]]
-#~         gem.setPosY( gem.getPosY()+27*j )
+#~         gem.posY( gem.posY()+27*j )
 #~         gem.draw_icon(@window)
 #~         @gridBoard[[x, j]] = gem
 #~       end
@@ -742,7 +762,7 @@ class Game_Puzzle
 #~       while j > 0
 #~         if( @gridBoard[[x, j]] != nil )
 #~           gem = @gridBoard[[x, j]]
-#~           gem.setPosY( gem.getPosY()+27 )
+#~           gem.posY( gem.posY()+27 )
 #~           gem.draw_icon(@window)
 #~           @gridBoard[[x, j+1]] = gem
 #~         end

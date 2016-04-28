@@ -8,7 +8,8 @@ class Gems
   attr_accessor   :boardY
   attr_accessor   :posX
   attr_accessor   :posY
-
+  attr_accessor   :isMatching
+  attr_accessor   :idIcon
 
   PADDING = 12
 
@@ -41,34 +42,20 @@ class Gems
         @viewport = Viewport.new(150 + PADDING, 165 + PADDING, 270, 250)
     end
     @viewport.z = 100
-    return Sprite_Movement.new( @bitmapGem, getPosX, getPosY, @viewport)
+    return Sprite_Movement.new( @bitmapGem, @posX, @posY, @viewport)
   end
 
   def matching?() return @isMatching end
-  def setMatching(isMatch) @isMatching = isMatch end
-
-  def setPosX(x)  @posX = x end
-  def setPosY(y)  @posY = y end
-
-  def getPosX() return @posX end
-  def getPosY() return @posY end
-
-  def setBoardIndexX(x) @posX = (x * 27)+3 end
-  def setBoardIndexY(y) @posY = (y * 27)+3 end
-
-  def getBoardIndexX() return (@posX / 27) end
-  def getBoardIndexY() return (@posY / 27) end
-
-  def getType() return @type end
-  def setType(type) @type = type end
 
   def doEffect() end
 
   def draw_icon()
-    @bitmapGem = Cache.picture("Gems/gem_" + getType().to_s)
-    @sprite = getSprite()
-    @sprite.visible
-    @sprite.z = 100
+    if(@type != 0)
+      @bitmapGem = Cache.picture("Gems/gem_" + @type.to_s)
+      @sprite = getSprite()
+      @sprite.visible
+      @sprite.z = 100
+    end
   end
 
   def setOpacity(opacity)
@@ -82,14 +69,12 @@ class Gems
 
   end
 
-  def getIdIcon()
-    return @idIcon
-  end
+
 
   #D�termine si le gem est de type void
   def voidGem?()
     if( self != nil )
-      if( self.getType() == 0 )
+      if( @type == 0 )
         return true
       end
     else
@@ -98,14 +83,14 @@ class Gems
   end
 
   def gemMulti?()
-    return ( self.getType() >= GEM_MULTI_X2 && self.getType() <= GEM_MULTI_X8 )
+    return ( @type >= GEM_MULTI_X2 && @type <= GEM_MULTI_X8 )
   end
 
   def gemElemental?()
-    return ( self.getType() == FIRE_GEM  ||
-             self.getType() == WATER_GEM ||
-             self.getType() == EARTH_GEM  ||
-             self.getType() == WIND_GEM
+    return ( @type == FIRE_GEM  ||
+             @type == WATER_GEM ||
+             @type == EARTH_GEM  ||
+             @type == WIND_GEM
            )
   end
 
@@ -305,22 +290,6 @@ class Skull20_Gem < Gems
 end
 
 
-
-
-#~ class Attack_Gem < Gems
-#~   def initialize(x, y)
-#~      super(7929, 9, x, y)
-#~      #puts("attack")
-#~    end
-#~
-#~   def doEffect()
-#~      puts("AttackEffect: " + @actor.points_attack.to_s )
-#~      ptsAttack = @actor.points_attack.to_i
-#~      ptsAttack += 1
-#~      @actor.setPoints_attack(ptsAttack)
-#~   end
-#~ end
-
 class Multi_Gem < Gems
   def initialize(x, y, multi)
      @Multi = multi
@@ -356,87 +325,6 @@ class Thunder_Gem < Gems
      #darkMana += 1
       #@actor.setDark_magic( darkMana.to_s )
    end
-end
-   # POKEMON GEM juste pour voir ca donne quoi
-   class Dragon_Gem < Gems
-     def initialize(x, y)
-        super(10, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-   end
-
-   class Poison_Gem < Gems
-     def initialize(x, y)
-        super(11, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-   end
-
-   class Flying_Gem < Gems
-     def initialize(x, y)
-        super(12, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-   end
-
-   class Bug_Gem < Gems
-     def initialize(x, y)
-        super(13, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-   end
-
-   class Ground_Gem < Gems
-     def initialize(x, y)
-        super(14, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-    end
-
-
-   class Rock_Gem < Gems
-     def initialize(x, y)
-        super(15, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-   end
-
-   class Frozen_Gem < Gems
-     def initialize(x, y)
-        super(16, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
-    end
-
-   class Ghost_Gem < Gems
-     def initialize(x, y)
-        super(17, x, y)
-        #puts("Dark")
-      end
-
-     def doEffect()
-     end
 end
 
  class Unknow_Gem < Gems

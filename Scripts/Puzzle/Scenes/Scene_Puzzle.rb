@@ -271,32 +271,32 @@ class Scene_Puzzle < Scene_MenuBase
       elsif( ! @inPauseMode )
 
           @typeMove = @puzzleBoardMouse.checkLeftClickOnBoard()
-          @gemToMove1 = @puzzleBoardMouse.getFirstGem()
-          @gemToMove2 = @puzzleBoardMouse.getSecondGem()
+          @gemToMove1 = @gamePuzzle.gridBoard[[0, 7]] # @puzzleBoardMouse.getFirstGem()
+          @gemToMove2 = @gamePuzzle.gridBoard[[1, 7]] #@puzzleBoardMouse.getSecondGem()
 
           checkBoardEmpty()   unless  @inPauseMode
+          puts("LEFT CLICK OK !!!: " + @gemToMove1.to_s + " " + @gemToMove2.to_s)
+          #~   if( @gemToMove1 != nil && @gemToMove2 != nil )
+          #~               puts("GEM TO MOVE OK!!")
+          #~                pposX = @gemToMove1.boardX()
+          #~                pposY = @gemToMove1.boardY()
 
-          if( @gemToMove1 != nil && @gemToMove2 != nil )
+          #~                @gemToMove1.setBoardIndexX( @gemToMove2.boardX() )
+          #~                @gemToMove1.setBoardIndexY( @gemToMove2.boardY() )
 
-               pposX = @gemToMove1.getBoardIndexX()
-               pposY = @gemToMove1.getBoardIndexY()
+          #~                @gemToMove2.setBoardIndexX( pposX )
+          #~                @gemToMove2.setBoardIndexY( pposY )
 
-               @gemToMove1.setBoardIndexX( @gemToMove2.getBoardIndexX() )
-               @gemToMove1.setBoardIndexY( @gemToMove2.getBoardIndexY() )
+          #~                @gamePuzzle.gridBoard[[@gemToMove1.boardX(), @gemToMove1.boardY()]] = @gemToMove2
+          #~                @gamePuzzle.gridBoard[[@gemToMove2.boardX(), @gemToMove2.boardY()]] = @gemToMove1
+          #~                gemD = @gamePuzzle.gridBoard[[7, 1]]
 
-               @gemToMove2.setBoardIndexX( pposX )
-               @gemToMove2.setBoardIndexY( pposY )
-
-               @gamePuzzle.gridBoard[[@gemToMove1.getBoardIndexX(), @gemToMove1.getBoardIndexY()]] = @gemToMove2
-               @gamePuzzle.gridBoard[[@gemToMove2.getBoardIndexX(), @gemToMove2.getBoardIndexY()]] = @gemToMove1
-               gemD = @gamePuzzle.gridBoard[[7, 1]]
-
-              @gamePuzzle.gridBoard[[7, 1]] = @gemToMove2
-              @gamePuzzle.gridBoard[[7, 2]] = @gemToMove1
-              @gamePuzzle.gridBoard[[@gemToMove2.getBoardIndexX(), @gemToMove2.getBoardIndexY()]] = @gemToMove1
-              @gamePuzzle.refreshBoard()
-              # checkSwitchGems()
-         end
+          #~               @gamePuzzle.gridBoard[[7, 1]] = @gemToMove2
+          #~               @gamePuzzle.gridBoard[[7, 2]] = @gemToMove1
+          #~               @gamePuzzle.gridBoard[[@gemToMove2.boardX(), @gemToMove2.boardY()]] = @gemToMove1
+          #~               @gamePuzzle.refreshBoard()
+          #~               checkSwitchGems()
+          #~          end
 
       end
     end
@@ -306,41 +306,45 @@ class Scene_Puzzle < Scene_MenuBase
   # Check si il y a D�placement de 2 gems � faire
   #---------------------------------------------------------------------------
   def checkSwitchGems( )
-      Sound.play_buzzer
+        Sound.play_cursor
 
-      if( @typeMove > 0 )
-       # puts("Viewport: " + @window_puzzleBoard.x.to_s + " : " + @window_puzzleBoard.y.to_s + " : " + @window_puzzleBoard.width.to_s + " : " + @window_puzzleBoard.height.to_s)
-         #rect = Rect.new(@window_puzzleBoard.contents.rect.x, @window_puzzleBoard.contents.rect.y, @window_puzzleBoard.contents.rect.width, @window_puzzleBoard.contents.rect.height)
-         viewport = Viewport.new(@window_puzzleBoard.x + PADDING, @window_puzzleBoard.y + PADDING, @window_puzzleBoard.contents.rect.width, @window_puzzleBoard.contents.rect.height)
+        if( @typeMove > 0 )
+         # puts("Viewport: " + @window_gameBoard.x.to_s + " : " + @window_gameBoard.y.to_s + " : " + @window_gameBoard.width.to_s + " : " + @window_gameBoard.height.to_s)
+           #rect = Rect.new(@window_gameBoard.contents.rect.x, @window_gameBoard.contents.rect.y, @window_gameBoard.contents.rect.width, @window_gameBoard.contents.rect.height)
+           viewport = Viewport.new(@window_gameBoard.x + PADDING, @window_gameBoard.y + PADDING, @window_gameBoard.contents.rect.width, @window_gameBoard.contents.rect.height)
 
-         #viewport = Viewport.new(@window_puzzleBoard.contents.rect)
-         viewport.z = 300
+           #viewport = Viewport.new(@window_gameBoard.contents.rect)
+           viewport.z = 300
 
 
-          @window_puzzleBoard.clear_icon(@gemToMove1.getPosX-1, @gemToMove1.getPosY-1, true)
-          @window_puzzleBoard.clear_icon(@gemToMove2.getPosX-1, @gemToMove2.getPosY-1, true)
+            @window_gameBoard.clear_icon(@gemToMove1.posX1, @gemToMove1.posY1, true)
+            @window_gameBoard.clear_icon(@gemToMove2.posX1, @gemToMove2.posY1, true)
 
-          bitmapCursor1 =  Cache.picture("curseur1")
-          bitmapCursor2 =  Cache.picture("curseur2")
+           # bitmapGem1 = @gemToMove1.getBitmap
+           # bitmapGem2 = @gemToMove2.getBitmap
+            bitmapCursor1 =  Cache.picture("curseur1")
+            bitmapCursor2 =  Cache.picture("curseur2")
+            #bitmapGem1.blt(3,3, @gemToMove1.getBitmap, Rect.new(0, 0, 24, 24), 255)
+        ###@gemToMove1.clear_icon
+        ###@gemToMove2.clear_icon
+            @spriteGem1 = @gemToMove1.getSprite() # Sprite_Movement.new( bitmapGem1, @gemToMove1.posX, @gemToMove1.posY, viewport)
+            @spriteCursor1 = Sprite_Movement.new( bitmapCursor1, @gemToMove1.posX3, @gemToMove1.posY3, viewport)
+            @spriteGem2 = @gemToMove2.getSprite() #Sprite_Movement.new( bitmapGem2, @gemToMove2.posX, @gemToMove2.posY, viewport)
+            @spriteCursor2 = Sprite_Movement.new( bitmapCursor2, @gemToMove2.posX3, @gemToMove2.posY3, viewport)
 
-          @spriteGem1 = @gemToMove1.getSprite() # Sprite_Movement.new( bitmapGem1, @gemToMove1.getPosX, @gemToMove1.getPosY, viewport)
-          @spriteCursor1 = Sprite_Movement.new( bitmapCursor1, @gemToMove1.getPosX-3, @gemToMove1.getPosY-3, viewport)
-          @spriteGem2 = @gemToMove2.getSprite() #Sprite_Movement.new( bitmapGem2, @gemToMove2.getPosX, @gemToMove2.getPosY, viewport)
-          @spriteCursor2 = Sprite_Movement.new( bitmapCursor2, @gemToMove2.getPosX-3, @gemToMove2.getPosY-3, viewport)
+            case @typeMove
+            when 1
+              switchGemsLeftToRight()
+            when 2
+              switchGemsRightToLeft()
+            when 3
+              switchGemsUpToDown()
+            when 4
+              switchGemsDownToUp()
+            end
+        else
 
-          case @typeMove
-          when 1
-            switchGemsLeftToRight()
-          when 2
-            switchGemsRightToLeft()
-          when 3
-            switchGemsUpToDown()
-          when 4
-            switchGemsDownToUp()
-          end
-      else
-
-      end
+        end
   end
 
   #---------------------------------------------------------------------------
@@ -507,18 +511,23 @@ class Scene_Puzzle < Scene_MenuBase
   # Update a chaque frame
   #--------------------------------------------------------------------------
   def update
-     super
-    $game_chrono.update
-    @window_upLeft.update() unless @window_upLeft == nil
-    @inPauseMode = false
+           super
+    #~     $game_chrono.update
+    #~     @window_gameDescription.update() unless @window_gameDescription == nil
+    #~     @inPauseMode = false
+    #~     #sleep(0.5)
+    #~     if @spriteGem1 != nil && @spriteGem1.moving && @spriteCursor1 != nil && @spriteGem2 != nil && @spriteCursor2 != nil
+    #~       update_switch2Gem()
+    #~     elsif( @spriteGems != nil ) #&& @spriteGems[6].moving )
+    #      for y in 0...BOARD_MAX_Y
+             #@spriteGems[y].update
+    #         if( isUpdating == false )
+    #           sleep(2)
+    #        end
+    #      end
+    #~     end
+
    end
 
-  #--------------------------------------------------------------------------
-  # Update gem et curseurs quand 2 gem
-  #--------------------------------------------------------------------------
-  def update_switch2Gem
-
-
-  end
 
 end
