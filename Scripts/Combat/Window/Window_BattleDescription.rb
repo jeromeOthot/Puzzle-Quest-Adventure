@@ -45,10 +45,10 @@ class Window_BattleDescription < Window_Base
  def update()
     if( ($game_chrono.count % Graphics.frame_rate) == 0 )
       contents.clear()
-      draw_icon(1505, 2, 2, enabled = true)  #Hourglass
-      draw_icon(8687, 100, 2, enabled = true) #Icon move gems
-      draw_time()
-      draw_nbMove()
+      #draw_icon(1505, 2, 2, enabled = true)  #Hourglass
+      #draw_icon(8687, 100, 2, enabled = true) #Icon move gems
+      #draw_time()
+      #draw_nbMove()
     end
  end
   
@@ -65,7 +65,7 @@ class Window_BattleDescription < Window_Base
   
   #--------------------------------------------------------------------------
   # * jump_textLine
-  # Permet de mettre un saut de ligne après un certain nombre de char
+  # Permet de mettre un saut de ligne aprï¿½s un certain nombre de char
   #--------------------------------------------------------------------------
   def jump_textLine(text, windowSize = 1)
     #Check si le texte n'est pas vide

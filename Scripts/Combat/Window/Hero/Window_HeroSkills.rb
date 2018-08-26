@@ -45,7 +45,7 @@ class Window_HeroSkills < Window_Base
   end
   
    def draw_magicIcon(x, y, type)
-    bitmap_heroFace = Bitmap.new("Graphics/Pictures/magie_mini" + type.to_s)
+    bitmap_heroFace = Bitmap.new("Graphics/Pictures/gemmes/magie_mini" + type.to_s)
     self.contents.blt(x, y, bitmap_heroFace, Rect.new(0, 0, 12, 12))
   end 
   
