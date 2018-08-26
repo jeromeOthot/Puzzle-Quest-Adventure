@@ -3,9 +3,6 @@ class Window_GameBoard < Window_Base
   NORMAL_BOARD_GRID_WIDTH = 8
   SKILLS_BOARD_GRID_WIDTH = 10
   
-  BOARD_START_X = 209
-  BOARD_START_Y = 182
-  
   #--------------------------------------------------------------------------
   # * Object Initialization
   #--------------------------------------------------------------------------
@@ -52,11 +49,11 @@ class Window_GameBoard < Window_Base
   def draw_gridBoard
    if( @gridWitdh == NORMAL_BOARD_GRID_WIDTH )
       bitmap_board = Bitmap.new("Graphics/Pictures/boardGame")
-      self.contents.blt(3, 6, bitmap_board, Rect.new(0, 0, 216, 216))
-      refresh()
+      self.contents.blt(5, 6, bitmap_board, Rect.new(0, 0, 216, 216))
+      #refresh()
    else
        bitmap_board = Bitmap.new("Graphics/Pictures/boardLearnSkills")
-      self.contents.blt(3, 6, bitmap_board, Rect.new(0, 0, 270, 270))
+      self.contents.blt(2, 2, bitmap_board, Rect.new(0, 0, 270, 270))
    end
   end
  
@@ -65,7 +62,7 @@ class Window_GameBoard < Window_Base
     for x in 0...8
       for y in 0...8
         #sleep(0.1)
-        draw_icon(7936, 65 + 27*x, 36+27*y, true)
+        draw_icon(7936, 3 + 27*x, 3+27*y, true)
       end
     end
   end
@@ -102,15 +99,14 @@ class Window_GameBoard < Window_Base
 #~      viewport1 = @window_gameBoard.viewport.new()
 
       @cursorSprite1.visible = true unless @cursorSprite1.visible
-      @cursorSprite1.x = x + BOARD_START_X
-      @cursorSprite1.y = y + BOARD_START_Y
+      @cursorSprite1.x = x + 211 #+ standard_padding
+      @cursorSprite1.y = y + 196 #+standard_padding
   end
   
   def draw_secondCursor(x, y) 
-      puts( "Draw 2nd cursor!!!")
       @cursorSprite2.visible = true unless @cursorSprite2.visible
-      @cursorSprite2.x =  x + self.x  + standard_padding + 1
-      @cursorSprite2.y =  y + self.y  + standard_padding + 5
+      @cursorSprite2.x = x + self.x + standard_padding
+      @cursorSprite2.y = y + self.y + standard_padding
   end
   
   def clear_firstCursor()

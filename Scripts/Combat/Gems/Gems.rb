@@ -22,12 +22,12 @@ class Gems
   EARTH_GEM = 3
   WIND_GEM  = 4
   
-  def initialize( type, x, y, boardX, boardY)
+  def initialize( type, x, y)
      @type = type
      @posX = x
      @posY = y
-     @boardX = boardX
-     @boardY = boardY
+     @boardX = ((x-30) / 27)
+     @boardY = (y / 27)
      @actor = $data_actors[1]
      @enemy = $data_enemies[1]
      @sprite = Sprite.new
@@ -56,11 +56,8 @@ class Gems
   def setBoardIndexX(x) @posX = (x * 27)+3 end
   def setBoardIndexY(y) @posY = (y * 27)+3 end    
     
-  #def getBoardIndexX() return (@posX / 27) end
- # def getBoardIndexY() return (@posY / 27) end  
-
-  def getBoardIndexX() return @boardX end
-  def getBoardIndexY() return @boardY end  
+  def getBoardIndexX() return (@posX / 27) end
+  def getBoardIndexY() return (@posY / 27) end   
     
   def getType() return @type end
   def setType(type) @type = type end
@@ -71,7 +68,7 @@ class Gems
     @bitmapGem = Cache.picture("gemmes/gemme_" + getType().to_s)
     @sprite = getSprite()
     @sprite.visible
-    @sprite.z = 200
+    @sprite.z = 100
   end
   
   def setOpacity(opacity)
@@ -139,8 +136,8 @@ class Gems
 end    
 
 class Void_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super( 0, x, y, boardX, boardY)
+  def initialize(x, y)
+     super( 0, x, y)
     # puts("fire")
   end
   
@@ -153,13 +150,13 @@ class Void_Gem < Gems
 end
 
 class Fire_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super( 1, x, y, boardX, boardY)
+  def initialize(x, y)
+     super( 1, x, y)
     # puts("fire")
   end
   
   def doEffect()
-   # puts("fireEffect: " + @actor.fire_magic )
+    puts("fireEffect: " + @actor.fire_magic )
     fireMana = @actor.fire_magic.to_i
     fireMana += 1
     @actor.setFire_magic( fireMana.to_s )
@@ -169,8 +166,8 @@ class Fire_Gem < Gems
 
  
 class Water_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-      super( 2, x, y, boardX, boardY)
+  def initialize(x, y)
+      super( 2, x, y)
      #puts("water")
    end
    
@@ -183,8 +180,8 @@ class Water_Gem < Gems
 end
  
 class Earth_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super( 3, x, y, boardX, boardY)
+  def initialize(x, y)
+     super( 3, x, y)
      #puts("earth")
    end
    
@@ -197,8 +194,8 @@ class Earth_Gem < Gems
 end
  
 class Wind_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super( 4, x, y, boardX, boardY)
+  def initialize(x, y)
+     super( 4, x, y)
      #puts("wind")
    end
    
@@ -211,8 +208,8 @@ class Wind_Gem < Gems
 end
 
 class Gold_Gem < Gems
-   def initialize(x, y, boardX, boardY)
-     super( 5, x, y, boardX, boardY)     
+   def initialize(x, y)
+     super( 5, x, y)     
    end
    
   def doEffect()
@@ -223,8 +220,8 @@ class Gold_Gem < Gems
 end
 
 class Exp_Gem < Gems
-   def initialize(x, y, boardX, boardY)
-     super( 6, x, y, boardX, boardY)     
+   def initialize(x, y)
+     super( 6, x, y)     
    end
    
   def doEffect()
@@ -262,8 +259,8 @@ end
 #~ end
 
 class Skull_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super( 10, x, y, boardX, boardY)
+  def initialize(x, y)
+     super( 10, x, y)
      #puts("skull")
    end
    
@@ -273,8 +270,8 @@ class Skull_Gem < Gems
 end
  
 class Skull5_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super( 11, x, y, boardX, boardY)
+  def initialize(x, y)
+     super( 11, x, y)
      #puts("skull5")
    end
    
@@ -285,8 +282,8 @@ end
 
 #Gem seulement dispo enemy lv 15
 class Skull10_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super(12, x, y, boardX, boardY)
+  def initialize(x, y)
+     super(12, x, y)
      #puts("skull")
    end
    
@@ -297,8 +294,8 @@ end
 
 #Gem seulement dispo enemy lv 30
 class Skull20_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super(13, x, y, boardX, boardY)
+  def initialize(x, y)
+     super(13, x, y)
      #puts("skull5")
    end
    
@@ -323,30 +320,30 @@ end
 #~ end
  
 class Multi_Gem < Gems
-  def initialize(x, y, multi, boardX, boardY)
+  def initialize(x, y, multi)
      @Multi = multi
-     super(18 + multi, x, y, boardX, boardY)
+     super(18 + multi, x, y)
   end
 end
 
 
 #Gems seulement disponible en mode puzzle
 class Ice_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super(7, x, y, boardX, boardY)
+  def initialize(x, y)
+     super(7, x, y)
      #puts("ice")
    end
  end
  
 class Thunder_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super(8, x, y, boardX, boardY)
+  def initialize(x, y)
+     super(8, x, y)
       #puts("thunder")
    end
  end 
  
  class Unknow_Gem < Gems
-  def initialize(x, y, boardX, boardY)
-     super(100, x, y, boardX, boardY)
+  def initialize(x, y)
+     super(100, x, y)
   end
 end
