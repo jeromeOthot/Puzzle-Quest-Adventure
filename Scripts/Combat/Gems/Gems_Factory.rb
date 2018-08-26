@@ -1,8 +1,8 @@
 ############################################################################
-#                  Classe qui crée les gemme selon le type
+#                  Classe qui creer les gemme selon le type
 ############################################################################
 class Gems_Factory
-  
+
   def create_gem(type, x, y)
      case type
      when 0

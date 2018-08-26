@@ -1,8 +1,8 @@
-f: feu (7936)
-g: glace (7937)
-t: tonnerre (7938)
-e: eau (7939)
-s: sol (7940)
-v: vent (7941)
-l: lumière (7942)
-o: ombre (7943)
+f: fire (7936)
+w: water (7937)
+e: earth
+a: air (wind)
+l: light
+i: ice
+t: thunder (7938)
+d: dark
