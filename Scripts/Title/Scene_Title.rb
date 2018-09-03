@@ -8,22 +8,22 @@ class Scene_Title < Scene_Base
   #Position menu solo
   WINDOW_MENU_SOLO_X = 370
   WINDOW_MENU_SOLO_Y = 125
-
+  
   WINDOW_MENU_MULTI_X = 370
   WINDOW_MENU_MULTI_Y = 175
-
+  
   WINDOW_MENU_puzzle_X = 370
   WINDOW_MENU_puzzle_Y = 225
-
+  
   WINDOW_MENU_OPTION_X = 370
   WINDOW_MENU_OPTION_Y = 275
-
+  
   WINDOW_MENU_SUCCESS_X = 370
   WINDOW_MENU_SUCCESS_Y = 325
-
+  
   WINDOW_MENU_QUIT_X = 370
   WINDOW_MENU_QUIT_Y = 375
-
+  
   #--------------------------------------------------------------------------
   # * Start Processing
   #--------------------------------------------------------------------------
@@ -38,13 +38,13 @@ class Scene_Title < Scene_Base
     create_cursor
     create_commands_menu
   end
-
-
+  
+  
   #Pour les click de souris
   def update_basic
     cursor_update
     mouse_cursor
-
+    
     checkLeftClick()
     checkClickHover()
   end
@@ -152,22 +152,22 @@ class Scene_Title < Scene_Base
     puts("Multiplayer")
     SceneManager.goto(Scene_Combat)
   end
-
+ 
   def command_puzzle
     puts("puzzle")
     SceneManager.goto(Scene_PuzzleMenu)
   end
-
+  
   def command_option
     puts("Option")
-     SceneManager.goto(Scene_Combat_Pokemon)
+     SceneManager.goto(Scene_Skill)
   end
-
+  
   def command_success
     puts("command success")
     SceneManager.goto(Scene_Inventory)
   end
-
+  
    #--------------------------------------------------------------------------
   # * [Shut Down] Command
   #--------------------------------------------------------------------------
@@ -184,7 +184,7 @@ class Scene_Title < Scene_Base
     RPG::BGS.stop
     RPG::ME.stop
   end
-
+  
   def create_commands_menu
     @window_commandSolo = Window_TitleOptions.new(WINDOW_MENU_SOLO_X, WINDOW_MENU_SOLO_Y, "      Solo")
     @window_commandMulti = Window_TitleOptions.new(WINDOW_MENU_MULTI_X, WINDOW_MENU_MULTI_Y, "   Multijoueur ")
@@ -193,26 +193,26 @@ class Scene_Title < Scene_Base
     @window_commandSuccess = Window_TitleOptions.new(WINDOW_MENU_SUCCESS_X, WINDOW_MENU_SUCCESS_Y, "     Succes")
     @window_commandQuit= Window_TitleOptions.new(WINDOW_MENU_QUIT_X, WINDOW_MENU_QUIT_Y, "     Quitter")
   end
-
+  
    def checkLeftClick()
     if( Mouse.lclick? == true)
      #Menu solo
-     if($cursor.x.to_i >= WINDOW_MENU_SOLO_X && $cursor.x <= (WINDOW_MENU_SOLO_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SOLO_Y && $cursor.y.to_i <= (WINDOW_MENU_SOLO_Y + 42))
-       command_solo
+     if($cursor.x.to_i >= WINDOW_MENU_SOLO_X && $cursor.x <= (WINDOW_MENU_SOLO_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SOLO_Y && $cursor.y.to_i <= (WINDOW_MENU_SOLO_Y + 42))    
+       command_solo  
       #Menu Multi
-       elsif($cursor.x.to_i >= WINDOW_MENU_MULTI_X && $cursor.x <= (WINDOW_MENU_MULTI_X + 150) && $cursor.y.to_i >= WINDOW_MENU_MULTI_Y && $cursor.y.to_i <= (WINDOW_MENU_MULTI_Y + 42))
+       elsif($cursor.x.to_i >= WINDOW_MENU_MULTI_X && $cursor.x <= (WINDOW_MENU_MULTI_X + 150) && $cursor.y.to_i >= WINDOW_MENU_MULTI_Y && $cursor.y.to_i <= (WINDOW_MENU_MULTI_Y + 42)) 
         command_multiplayer
       #Menu puzzle
-      elsif($cursor.x.to_i >= WINDOW_MENU_puzzle_X && $cursor.x <= (WINDOW_MENU_puzzle_X + 150) && $cursor.y.to_i >= WINDOW_MENU_puzzle_Y && $cursor.y.to_i <= (WINDOW_MENU_puzzle_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_puzzle_X && $cursor.x <= (WINDOW_MENU_puzzle_X + 150) && $cursor.y.to_i >= WINDOW_MENU_puzzle_Y && $cursor.y.to_i <= (WINDOW_MENU_puzzle_Y + 42))    
         command_puzzle
       #Menu option
-      elsif($cursor.x.to_i >= WINDOW_MENU_OPTION_X && $cursor.x <= (WINDOW_MENU_OPTION_X + 150) && $cursor.y.to_i >= WINDOW_MENU_OPTION_Y && $cursor.y.to_i <= (WINDOW_MENU_OPTION_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_OPTION_X && $cursor.x <= (WINDOW_MENU_OPTION_X + 150) && $cursor.y.to_i >= WINDOW_MENU_OPTION_Y && $cursor.y.to_i <= (WINDOW_MENU_OPTION_Y + 42))    
         command_option
       #Menu success
-      elsif($cursor.x.to_i >= WINDOW_MENU_SUCCESS_X && $cursor.x <= (WINDOW_MENU_SUCCESS_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SUCCESS_Y && $cursor.y.to_i <= (WINDOW_MENU_SUCCESS_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_SUCCESS_X && $cursor.x <= (WINDOW_MENU_SUCCESS_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SUCCESS_Y && $cursor.y.to_i <= (WINDOW_MENU_SUCCESS_Y + 42))    
         command_success
       #Menu Quit
-      elsif($cursor.x.to_i >= WINDOW_MENU_QUIT_X && $cursor.x <= (WINDOW_MENU_QUIT_X + 150) && $cursor.y.to_i >= WINDOW_MENU_QUIT_Y && $cursor.y.to_i <= (WINDOW_MENU_QUIT_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_QUIT_X && $cursor.x <= (WINDOW_MENU_QUIT_X + 150) && $cursor.y.to_i >= WINDOW_MENU_QUIT_Y && $cursor.y.to_i <= (WINDOW_MENU_QUIT_Y + 42))    
         command_shutdown
       else
         clear_cursor()
@@ -220,49 +220,49 @@ class Scene_Title < Scene_Base
     end
   end
 
-
+   
    def checkClickHover()
      #Menu solo
-     if($cursor.x.to_i >= WINDOW_MENU_SOLO_X && $cursor.x <= (WINDOW_MENU_SOLO_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SOLO_Y && $cursor.y.to_i <= (WINDOW_MENU_SOLO_Y + 42))
+     if($cursor.x.to_i >= WINDOW_MENU_SOLO_X && $cursor.x <= (WINDOW_MENU_SOLO_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SOLO_Y && $cursor.y.to_i <= (WINDOW_MENU_SOLO_Y + 42))    
         draw_cursor(WINDOW_MENU_SOLO_X, WINDOW_MENU_SOLO_Y)
       #Menu Multi
-       elsif($cursor.x.to_i >= WINDOW_MENU_MULTI_X && $cursor.x <= (WINDOW_MENU_MULTI_X + 150) && $cursor.y.to_i >= WINDOW_MENU_MULTI_Y && $cursor.y.to_i <= (WINDOW_MENU_MULTI_Y + 42))
+       elsif($cursor.x.to_i >= WINDOW_MENU_MULTI_X && $cursor.x <= (WINDOW_MENU_MULTI_X + 150) && $cursor.y.to_i >= WINDOW_MENU_MULTI_Y && $cursor.y.to_i <= (WINDOW_MENU_MULTI_Y + 42))    
         draw_cursor(WINDOW_MENU_MULTI_X, WINDOW_MENU_MULTI_Y)
       #Menu tournois
-      elsif($cursor.x.to_i >= WINDOW_MENU_puzzle_X && $cursor.x <= (WINDOW_MENU_puzzle_X + 150) && $cursor.y.to_i >= WINDOW_MENU_puzzle_Y && $cursor.y.to_i <= (WINDOW_MENU_puzzle_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_puzzle_X && $cursor.x <= (WINDOW_MENU_puzzle_X + 150) && $cursor.y.to_i >= WINDOW_MENU_puzzle_Y && $cursor.y.to_i <= (WINDOW_MENU_puzzle_Y + 42))    
         draw_cursor(WINDOW_MENU_puzzle_X, WINDOW_MENU_puzzle_Y)
       #Menu option
-      elsif($cursor.x.to_i >= WINDOW_MENU_OPTION_X && $cursor.x <= (WINDOW_MENU_OPTION_X + 150) && $cursor.y.to_i >= WINDOW_MENU_OPTION_Y && $cursor.y.to_i <= (WINDOW_MENU_OPTION_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_OPTION_X && $cursor.x <= (WINDOW_MENU_OPTION_X + 150) && $cursor.y.to_i >= WINDOW_MENU_OPTION_Y && $cursor.y.to_i <= (WINDOW_MENU_OPTION_Y + 42))    
         draw_cursor(WINDOW_MENU_OPTION_X, WINDOW_MENU_OPTION_Y)
       #Menu success
-      elsif($cursor.x.to_i >= WINDOW_MENU_SUCCESS_X && $cursor.x <= (WINDOW_MENU_SUCCESS_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SUCCESS_Y && $cursor.y.to_i <= (WINDOW_MENU_SUCCESS_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_SUCCESS_X && $cursor.x <= (WINDOW_MENU_SUCCESS_X + 150) && $cursor.y.to_i >= WINDOW_MENU_SUCCESS_Y && $cursor.y.to_i <= (WINDOW_MENU_SUCCESS_Y + 42))    
         draw_cursor(WINDOW_MENU_SUCCESS_X, WINDOW_MENU_SUCCESS_Y)
       #Menu Quit
-      elsif($cursor.x.to_i >= WINDOW_MENU_QUIT_X && $cursor.x <= (WINDOW_MENU_QUIT_X + 150) && $cursor.y.to_i >= WINDOW_MENU_QUIT_Y && $cursor.y.to_i <= (WINDOW_MENU_QUIT_Y + 42))
+      elsif($cursor.x.to_i >= WINDOW_MENU_QUIT_X && $cursor.x <= (WINDOW_MENU_QUIT_X + 150) && $cursor.y.to_i >= WINDOW_MENU_QUIT_Y && $cursor.y.to_i <= (WINDOW_MENU_QUIT_Y + 42))    
         draw_cursor(WINDOW_MENU_QUIT_X, WINDOW_MENU_QUIT_Y)
       else
         clear_cursor()
       end
-    end
-
+    end 
+    
   def create_cursor
     @cursorMenu = Sprite.new
     @cursorMenu.bitmap = Cache.picture("title_cursor2")
     @cursorMenu.z = 200
     @cursorMenu.visible = false
   end
-
+  
    def draw_cursor(x, y)
       @cursorMenu.visible = true unless @cursorMenu.visible
       @cursorMenu.x = x
       @cursorMenu.y = y
-    end
-
+    end 
+  
   def clear_cursor()
     @cursorMenu.visible = false
     @cursorMenu.x = 0
     @cursorMenu.y = 0
-
+  
   end
-
+  
 end

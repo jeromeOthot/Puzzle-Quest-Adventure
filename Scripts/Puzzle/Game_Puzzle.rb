@@ -85,8 +85,7 @@ class Game_Puzzle
     for y in 0...BOARD_MAX_Y
       for x in 0...BOARD_MAX_X
         if(  gridBoard[[x,y]] != nil )
-          @gridBoard[[x,y]].clear_icon()
-          @gridBoard[[x,y]].draw_icon()
+          @gridBoard[[x,y]].refresh()
         else
 #~           if( @gridBoard[[i, j]] != nil && @gridBoard[[i, j]].matching? )
 #~             @gridBoard[[x, y]].clear_icon()
@@ -153,7 +152,6 @@ class Game_Puzzle
   # Cr�e des gems al�atoire sur la grille de 8x8
   #############################################################################
   def createGemsOnBoard
-    puts "Create Gem on board"
     for y in 0...BOARD_MAX_Y
       for x in 0...BOARD_MAX_X
         gem = @gemsFactory.create_gem(rand(NB_TYPE_GEMS)+1.to_i, 3 + 27*x, 3+27*y) 
@@ -245,19 +243,6 @@ class Game_Puzzle
   def checkGemMove(firstGem, secondGem)
     
     isMoveValid = false
-    
-    #On inverse la position des 2 gems du board sans changer le board directement
-#~     tmpFirstPosX = secondGem.getBoardIndexX
-#~     tmpFirstPosY = secondGem.getBoardIndexY
-#~     tmpType = secondGem.getType
-#~     
-#~     firstGem.setBoardIndexX(secondGem.getBoardIndexX)
-#~     firstGem.setBoardIndexY(secondGem.getBoardIndexY)
-#~     firstGem.setType(secondGem.getType)
-#~     
-#~     secondGem.setBoardIndexX(tmpFirstPosX)
-#~     secondGem.setBoardIndexY(tmpFirstPosY)
-#~     secondGem.setType(tmpType)
 
     #puts("gem1: " + firstGem.to_s)
     #puts("gem2: " + secondGem.to_s)
@@ -271,6 +256,7 @@ class Game_Puzzle
     end
 
     return isMoveValid
+	
   end
   
   #############################################################################
@@ -306,8 +292,8 @@ class Game_Puzzle
   #Inverse la position de 2 gems
   #############################################################################
   def inverse2gemsPosition(posFirstX, posFirstY, posSecondX, posSecondY)
-  
-    puts("inverse gem: " + posFirstX.to_s + "," + posFirstY.to_s + " : " + posSecondX.to_s + "," + posSecondY.to_s )
+	#puts("before: " +  @gridBoard[[0, 0]].to_s + "  " + @gridBoard[[0, 1]].to_s)
+    ##puts("inverse gem: " + posFirstX.to_s + "," + posFirstY.to_s + " : " + posSecondX.to_s + "," + posSecondY.to_s )
     if( posFirstX >= 0  && posFirstX < 8 &&  posFirstY >= 0  && posFirstY < 8 )
       if( posSecondX >= 0  && posSecondX < 8 &&  posSecondY >= 0  && posSecondY < 8 )
         
@@ -315,8 +301,15 @@ class Game_Puzzle
          secGem = @gridBoard[[posSecondX, posSecondY]]
         
           if( fisGem != nil && secGem != nil)
+		   @gridBoard[[posFirstX, posFirstY]].clear_icon()
+		  @gridBoard[[posFirstX, posFirstY]] = nil
             @gridBoard[[posFirstX, posFirstY]] = @gemsFactory.create_gem(secGem.getType(), fisGem.getPosX, fisGem.getPosY, posFirstX, posFirstY)
+			@gridBoard[[posFirstX, posFirstY]].refresh()
+			@gridBoard[[posSecondX, posSecondY]].clear_icon()
+			@gridBoard[[posSecondX, posSecondY]] = nil
             @gridBoard[[posSecondX, posSecondY]] = @gemsFactory.create_gem(fisGem.getType(), secGem.getPosX, secGem.getPosY, posSecondX, posSecondY)
+			@gridBoard[[posSecondX, posSecondY]].refresh()
+
           elsif( fisGem != nil && secGem == nil)
               @gridBoard[[posSecondX, posSecondY]] = nil
           elsif( secGem != nil && fisGem == nil)
@@ -362,7 +355,7 @@ class Game_Puzzle
         end
       end
     end
-    removeAllGemsMatching()
+    #removeAllGemsMatching()
     return isCombine
   end
   
@@ -430,11 +423,13 @@ class Game_Puzzle
           if( length >= 3 && i == max - 1)
             setGemsMatching(i - length +1, i, indexY, indexY) 
             isHorizontalCombination = true
+			break
           end
         else
           if( length >= 3)
             setGemsMatching(i - length, i - 1, indexY, indexY) 
             isHorizontalCombination = true
+			break
           end
          length = 0
         end
@@ -468,11 +463,13 @@ class Game_Puzzle
           if( length >= 3 && j == max - 1)
             setGemsMatching(indexX, indexX, j - length +1, j) 
             isVerticalCombination = true
+			break
           end
         else
           if( length >= 3)
             setGemsMatching( indexX, indexX, j - length, j - 1)
             isVerticalCombination = true
+			break
           end
         end
       end
@@ -488,27 +485,31 @@ class Game_Puzzle
       for j in startY...finishY + 1
         if( @gridBoard[[i, j]] != nil )
           @gridBoard[[i, j]].setMatching(true)
-          #puts("setMatching: " + i.to_s + " : " + j.to_s )
+		   @gridBoard[[i, j]].setType(0)			
+		   @gridBoard[[i, j]].refresh()
+		  # doCascadeGem(i, j)
+		  #refreshBoard()
+         # puts("setMatch: " + i.to_s + " : " + j.to_s )
         end
       end 
     end
-     #doCascadeBoard()
    end
    
   #############################################################################
   #Enl�ve les gems qui font une combinaison de 3 ou plus
   #############################################################################
-  def removeAllGemsMatching() 
-    for i in 0..BOARD_MAX_X
-      for j in 0..BOARD_MAX_Y
-        if( @gridBoard[[i, j]] != nil && @gridBoard[[i, j]].matching? )
-          #puts("setMatching: " + i.to_s + " : " + j.to_s )
-          @gridBoard[[i, j]].doEffect()
-		  @gridBoard[[i, j]].setType(0)
+  def doCascadeBoard() 
+    for i in 0...BOARD_MAX_X
+      for j in 0...BOARD_MAX_Y
+        if( @gridBoard[[i, j]] != nil && @gridBoard[[i, j]].matching?  )
+         #puts("Matching: " + i.to_s + " : " + j.to_s )
+		   doCascadeGem(i, j)
+		   # @gridBoard[[i, j]].setMatching(false)
+		   # @gridBoard[[i, j]].setType(0)			
+		   #@gridBoard[[i, j]].refresh()
         end
       end 
     end
-     #doCascadeBoard()
    end
    
   
@@ -545,25 +546,30 @@ class Game_Puzzle
   #############################################################################
   def createGemOnBoardWithCode( code, posX, posY)
     gem = nil
+	#27*posX, 8+27*posY,  posX, posY) 
     case code
+    when "-"
+      gem = @gemsFactory.create_gem(0, 51 + 27*posX, 8+27*posY,  posX, posY)
+     when "f"
+      gem = @gemsFactory.create_gem(1, 51 + 27*posX, 8+27*posY,  posX, posY)
+    when "w"
+      gem = @gemsFactory.create_gem(2, 51 + 27*posX, 8+27*posY,  posX, posY)
     when "e"
-      gem = @gemsFactory.create_gem(2, 50 + 27*posX, 8+27*posY,  posX, posY) 
-    when "f"
-      gem = @gemsFactory.create_gem(1, 50 + 27*posX, 8+27*posY,  posX, posY) 
+      gem = @gemsFactory.create_gem(3, 51 + 27*posX, 8+27*posY,  posX, posY)
+    when "a"
+      gem = @gemsFactory.create_gem(4,  51 + 27*posX, 8+27*posY,  posX, posY)
     when "g"
-      gem = @gemsFactory.create_gem(7, 50 + 27*posX, 8+27*posY,  posX, posY) 
-    when "l"
-      gem = @gemsFactory.create_gem(13, 50 + 27*posX, 8+27*posY,  posX, posY) 
-    when "o"
-      gem = @gemsFactory.create_gem(14, 50 + 27*posX, 8+27*posY,  posX, posY)
-    when "t"
-      gem = @gemsFactory.create_gem(8, 50 + 27*posX, 8+27*posY,  posX, posY) 
-    when "s"
-      gem = @gemsFactory.create_gem(3, 50 + 27*posX, 8+27*posY,  posX, posY)  
-    when "v"
-      gem = @gemsFactory.create_gem(4, 50 + 27*posX, 8+27*posY,  posX, posY) 
+      gem = @gemsFactory.create_gem(5, 51 + 27*posX, 8+27*posY,  posX, posY)
     when "x"
-      gem = @gemsFactory.create_gem(0, 50 + 27*posX, 8+27*posY,  posX, posY) 
+      gem = @gemsFactory.create_gem(6, 51 + 27*posX, 8+27*posY,  posX, posY) 
+    when "i"
+      gem = @gemsFactory.create_gem(7, 51 + 27*posX, 8+27*posY,  posX, posY)  
+    when "t"
+      gem = @gemsFactory.create_gem(8, 51 + 27*posX, 8+27*posY,  posX, posY)
+	when "d"
+      gem = @gemsFactory.create_gem(9, 51 + 27*posX, 8+27*posY,  posX, posY)
+    else 
+      gem = @gemsFactory.create_gem(0, 51 + 27*posX, 8+27*posY,  posX, posY)	  
     end
     
     if( gem != nil )
@@ -574,216 +580,44 @@ class Game_Puzzle
     end
   end
   
-  #############################################################################
-  #Permet d'effectuer la cascade gem, v�rifie les o� il y a des trous et 
-  #fait descendres les gem. Met un gem random si aucun gem ne situe en haut d'un trou.
-  #############################################################################
-  def doCascadeBoard()
-    x = BOARD_MAX_X-1
-    y = BOARD_MAX_Y-1
-    while y > 0
-      while x > 0 
-        if( @gridBoard[[x, y]] != nil)
-           #On v�rifie si le gem est void,
-           if( @gridBoard[[x, y]].voidGem? )
-             #si le gem est void, on va chercher un gem non void en haut de celui-ci.
-             k = 1
-             while( @gridBoard[[x, y-k]] != nil  && @gridBoard[[x, y-k]].voidGem? )
-               k += 1
-             end
-             if( @gridBoard[[x, y-k]] != nil )
-               #inverse2gemsPosition(x, y, @gridBoard[[x, y-k]].getBoardIndexX, @gridBoard[[x, y-k]].getBoardIndexY)
-               
-#~                if( checkCascadeCombinaison( x, y ) )
-#~                  doCascadeBoard()
-#~                end
-             end
-           end
-         end
-         x -= 1
-       end
-       x = BOARD_MAX_X-1
-       y -= 1
-     end
-     
-     if( checkCombinaison() )
-        doCascadeBoard()
-     end
-  end
+
   
   #############################################################################
   #On v�rifie si il ya une combinaison lors d'une cascade
   #############################################################################
-  def checkCascadeCombinaison( posX, posY )
-    gem = @gridBoard[[posX, posY]]
-    isComb1 = horizontal_check( gem )
-    isComb2 = vertical_check( gem )
+  # def checkCascadeCombinaison( posX, posY )
+    # gem = @gridBoard[[posX, posY]]
+    # isComb1 = horizontal_check( gem )
+    # isComb2 = vertical_check( gem )
     
-    if( isComb1 || isComb2 )
-      return true
-    else
-      return false
-    end
-  end
+    # if( isComb1 || isComb2 )
+      # return true
+    # else
+      # return false
+    # end
+  # end
+  
+  
   #############################################################################
   #Permet d'effectuer la cascade d'un gem.
   #############################################################################
-#~   def doCascadeGem(x, y)
-#~     if( @gridBoard[[x, y]] == nil )
-#~          puts("doCascadeGem")
-#~          j = y-1
-#~          gem = nil
-#~          while j >= 0
-#~             #if( j != 0 )
-#~                gem = @gridBoard[[x, j]]
-#~                puts("gem:" + gem.to_s )
-#~                gem.setPosY( gem.getPosY()+27 )
-#~                gem.draw_icon(@window)
-#~                @gridBoard[[x, j+1]] = gem
-#~              #else
-#~                #gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].getPosX(), @gridBoard[[x, 0]].getPosY())
-#~                #gem.draw_icon(@window)
-#~                #@gridBoard[[x, 0]] = gem 
-#~             #end
-#~             j -= 1
-#~           end
-#~           
-#~           gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].getPosX(), 3)
-#~           gem.draw_icon(@window)
-#~           @gridBoard[[x, 0]] = gem 
-#~           
-#~       gemBas = @gridBoard[[x, y-1]]
-#~       #gemHaut = @gemsFactory.create_gem(100, gemBas.getPosX(), gemBas.getPosY())
-#~       gemHaut = @gemsFactory.create_gem(100, gemBas.getPosX(), gemBas.getPosY())
-#~       
-#~       gemBas.setPosY( gemHaut.getPosY()+27 )
-#~       gemBas.draw_icon(@window)
-#~       #gemBas.setPosY( gemHaut.getPosY() )
-#~       gemHaut.draw_icon(@window)
-#~       
-#~       
-#~       @gridBoard[[x, y]] = gemBas
-#~       #@gridBoard[[x, y-1]] = gemBas
-#~       
-#~      # @gridBoard[[x, y-1]].clear_icon(@window)
-#~       @gridBoard[[x, y-1]] = gemHaut
-#~       
-#~       #@gridBoard[[x, y-1]].clear_icon(@window)
-#~       #@gridBoard[[x, y-1]] = nil
-#~       gemRandom = @gridBoard[[x, y-1]]
-#~       j = y - 2
-#~       while j >= 0
-#~         if( @gridBoard[[x, j]] != gemRandom )
-#~             gemHaut = #@gemsFactory.create_gem(100, @gridBoard[[x, j]].getPosX(), @gridBoard[[x, j]].getPosY())
-#~             @gridBoard[[x, j]] = gemHaut
-#~             gemHaut.draw_icon(@window)
-#~          else
-#~            break
-#~          end
-#~          j -= 1
-      #end
-      
-#~       if( j != 0 )
-#~         gem = @gridBoard[[x, y]]
-#~         gem.setPosY( gem.getPosY()+27*j )
-#~         gem.draw_icon(@window)
-#~         @gridBoard[[x, j]] = gem
-#~       end
-#~       end
-#~     end
-#~   end
-#~   
-#~   def doCascadeBoard()
-#~     x = BOARD_MAX_X
-#~     y = BOARD_MAX_Y
-#~     while ( y >= 0 )
-#~       while (  x >= 0 )
-#~         #Pour la 1er ligne, on met des gem random
-#~         if( y == 0 )
-#~           if( @gridBoard[[x, y]] == nil )
-#~             puts("Create random gem ")
-#~             gem = @gemsFactory.create_gem(rand(NB_TYPE_GEMS)+1.to_i, 3 + 27*x, 3+27*y) 
-#~             gem.draw_icon(@window)
-#~             @gridBoard[[x, y]] = gem
-#~           end
-#~         else
-#~           doCascadeGem(x, y)
-#~         end
-#~         x -= 1
-#~       end 
-#~       x = BOARD_MAX_X
-#~       y -= 1
-#~     end
-#~   end
-#~   def doCascadeGem(x, y)
-#~     if( @gridBoard[[x, y]] == nil )
-#~       j = y-1
-#~       while j > 0
-#~         if( @gridBoard[[x, j]] != nil )
-#~           gem = @gridBoard[[x, j]]
-#~           gem.setPosY( gem.getPosY()+27 )
-#~           gem.draw_icon(@window)
-#~           @gridBoard[[x, j+1]] = gem
-#~         end
-#~         #j -= 1
-#~       end
-#~     end
-#~   end
-
-#~   def FindMatches()
-#~     @NumMatchesFound = 0
-#~     #On passe tous les gems pour v�rifier une combinaison en x
-#~       for y in 0...BOARD_MAX_Y
-#~         for x in 0...BOARD_MAX_X
-#~           gem = @gridBoard[[x,y]]        
-#~           @NumMatchesFound = 1
-#~           CheckMatchesX(gem)
-#~       
-#~           if( NumMatchesFound  >= 3 )
-#~             gem.matching? = true
-#~           end
-#~           
-#~           if( IsMatched == true )
-#~             #Wait(0.1)
-#~             gem.clear_icon()
-#~           end
-#~         end
-#~       end
-    
-    #On passe tous les gems pour v�rifier une combinaison en y
-  #~ 	for(0...nbGems)
-  #~ 		NumMatchesFound = 1
-  #~ 		CheckMatchesY(PosX, posY, type)
-  #~ 		
-  #~ 		if( NumMatchesFound  >= 3 )
-  #~ 			IsMatched = true
-  #~ 		end
-  #~ 	end
-  #~ 	
-    
-  #~ 	if( IsMatched == true )
-  #~ 		Wait(0.1)
-  #~ 		destroyGem
-  #~ 	end
-  #~end
-
-#~   def CheckMatchesX(PosX, PosY, Type)
-#~     if(  x == PosX + 1 )
-#~       if( y == y )
-#~         if( type = Type )
-#~           @NumMatchesFound += 1
-#~           CheckMatchesX(PosX + 1, y, type)
-#~           
-#~           if( @NumMatchesFound  >= 3 )
-#~             IsMatched = true
-#~           end
-#~         end
-#~       end
-#~     end
-#~   end
-
-
-
+    def doCascadeGem(x, y)
+		puts("doCascadeGem: " + x.to_s + "  " + y.to_s)
+		i = y
+		while i >= 0
+			gridBoard[[x, i]].setMatching(false)
+			if(i == 0)
+				@gridBoard[[x, i]].setType(0)
+				@gridBoard[[x, i]].refresh()
+			else
+				gridBoard[[x, i]].clear_icon()
+				gridBoard[[x, i]].setType( @gridBoard[[x, i-1]].getType() )
+				@gridBoard[[x, i]].refresh()
+			end
+			i -= 1
+		end
+  
+    end  
 
 
 end

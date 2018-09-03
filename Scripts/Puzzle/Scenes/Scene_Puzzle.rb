@@ -107,9 +107,9 @@ class Scene_Puzzle < Scene_MenuBase
     mouse_cursor
     
     checkBreakButton() unless  @inPauseMode
-    checkLeftClick() 
+    checkLeftClick() unless  @inPauseMode
     checkClickHover()  unless  @inPauseMode
-    
+    sleep(0.01)
     if( @gamePuzzle != nil )
      # sleep(0.01)
      # @gamePuzzle.doCascadeBoard()
@@ -291,8 +291,8 @@ class Scene_Puzzle < Scene_MenuBase
           
           
            
-            if( @gemToMove1 != nil && @gemToMove2 != nil )
-			    puts("MOVE: " + @gemToMove1.to_s + " -> " + @gemToMove2.to_s)  	
+            #if( @gemToMove1 != nil && @gemToMove2 != nil )
+			  #  puts("MOVE: " + @gemToMove1.to_s + " -> " + @gemToMove2.to_s)  	
               # pposX = @gemToMove1.getBoardIndexX()
               # pposY = @gemToMove1.getBoardIndexY()
              
@@ -311,7 +311,7 @@ class Scene_Puzzle < Scene_MenuBase
              # @gamePuzzle.gridBoard[[@gemToMove2.getBoardIndexX(), @gemToMove2.getBoardIndexY()]] = @gemToMove1
              # @gamePuzzle.refreshBoard()
              # checkSwitchGems()
-         end
+         #end
         
         #@gameItemMenuMouse.checkLeftClickOnBoard( self ) unless $inItemSelectionMode == false
       end

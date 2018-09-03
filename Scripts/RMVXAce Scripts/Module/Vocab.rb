@@ -1,20 +1,10 @@
-# encoding: UTF-8
-# coding: UTF-8
-# -*- coding: UTF-8 -*-
-# coding: UTF-8
-# encoding: UTF-8
-# zencoding: UTF-8
-# vocoding: UTF-8
-# fun coding: UTF-8
-# decoding: UTF-8
-# 863280148705622662 coding: UTF-8 0072364213
-# It was the night before Christmas and all through the house, not a creature was coding: UTF-8, not even with a mouse
 #==============================================================================
 # ** Vocab
 #------------------------------------------------------------------------------
 #  This module defines terms and messages. It defines some data as constant
 # variables. Terms in the database are obtained from $data_system.
 #==============================================================================
+
 module Vocab
 
   # Shop Screen

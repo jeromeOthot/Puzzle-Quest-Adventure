@@ -1,9 +1,9 @@
 ############################################################################
-#                    Classe de dï¿½roulement de combat
+#                    Classe de déroulement de combat
 ############################################################################
 class Game_Battle
   attr_accessor :gridBoard
-
+  
   BOARD_MAX_X = 8
   BOARD_MAX_Y = 8
 
@@ -11,7 +11,7 @@ class Game_Battle
   HERO_ATTACK_ZONE_Y = 55
   HERO_ATTACK_ZONE_WIDTH = 96
   HERO_ATTACK_ZONE_HEIGHT = 96
-
+  
   GEM_INDEX_SKULL = 10
   GEM_INDEX_MULTI = 20
   GEM_INDEX_FIRE = 1
@@ -20,41 +20,41 @@ class Game_Battle
   GEM_INDEX_WIND = 4
   GEM_INDEX_EXP = 5
   GEM_INDEX_GOLD = 6
-
+  
   def initialize(window, actor, enemy)
      @actor = actor #$data_actors[1]
      @enemy = enemy #$data_enemy[1]
      @gridBoard = Hash.new
-     @gridGemsIndex = Hash.new
-     @gemsToRemove = Array.new
+     @gridGemsIndex = Hash.new 
+     @gemsToRemove = Array.new 
      @window = window
      @gemsFactory = Gems_Factory.new(  )
 
     #@subject.item_apply(self, attack_skill)
-
+     
      initializeBoard()
      #clearBoard()
    end
-
+  
   ############################################################################
-  # Fait subir des dï¿½gats ï¿½ l'enemie
+  # Fait subir des dégats à l'enemie
   ############################################################################
   def attackEnemy()
         isAttackWork = true
 
 #~     @event = $data_common_events[3]
-#~     @interpreter = Game_Interpreter.new(1)
-#~
+#~     @interpreter = Game_Interpreter.new(1) 
+#~     
 #~     if @interpreter
 #~       @interpreter.setup(@event.list) unless @interpreter.running?
 #~       @interpreter.update
 #~     end
 #~     #@interpreter.play_animation()
-#~
-#~
+#~     
+#~     
 
          if(@actor.actor.points_attack.to_i >= @actor.equips[0].point_cost.to_i )
-           @actor.actor.setPoints_attack((@actor.actor.points_attack.to_i - @actor.equips[0].point_cost.to_i).to_s)
+           @actor.actor.setPoints_attack((@actor.actor.points_attack.to_i - @actor.equips[0].point_cost.to_i).to_s) 
            @enemy.setHP(@enemy.hp - @actor.equips[0].physical_damage.to_i)
 
           @actor.change_hp(-5, true)
@@ -64,12 +64,12 @@ class Game_Battle
          # window_VS.draw_actorHP()
          # show_damage()
          else
-           isAttackWork = false
+           isAttackWork = false 
          end
-
+      
       return isAttackWork
-  end
-
+  end 
+   
   def getGemFromIndex(x, y)
     if( x >= 0 && x < 8 && y >= 0 && y < 8 )
       return @gridBoard[[x,y]]
@@ -77,7 +77,7 @@ class Game_Battle
       return nil
     end
   end
-
+  
   def initializeBoard()
     createGemIndexForBoard()
     createGemsOnBoard()
@@ -88,40 +88,40 @@ class Game_Battle
 #~       x = x+1
 #~      end
   end
-
+  
   def drawGem(gem)
     gem.draw_icon(@window)
   end
-
+  
   def refreshBoard()
 #~      gem = @gemsFactory.create_gem(1, 3 + 27*2, 3+27*3)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[2,3]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(2, 3 + 27*3, 3+27*3)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[3,3]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(2, 3 + 27*4, 3+27*3)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[4,3]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(1, 3 + 27*5, 3+27*3)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[5,3]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(3, 3 + 27*6, 3+27*3)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[6,3]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(4, 3 + 27*7, 3+27*3)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[7,3]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(3, 3 + 27*4, 3+27*4)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[4,4]] = gem
-#~
+#~      
 #~      gem = @gemsFactory.create_gem(3, 3 + 27*5, 3+27*4)
 #~      gem.draw_icon(@window)
 #~      @gridBoard[[5,4]] = gem
@@ -132,9 +132,9 @@ class Game_Battle
       end
     end
   end
-
+  
   #############################################################################
-  # Crï¿½e les index des gem pour le board
+  # Crée les index des gem pour le board
   #############################################################################
   def createGemIndexForBoard()
     sMatrice = ""
@@ -146,47 +146,47 @@ class Game_Battle
       puts(sMatrice)
     end
   end
-
-
+  
+  
   #############################################################################
   # Check les combinaison d'index
   #############################################################################
   def checkCombineIndex(x, y)
       indexGem = getRandomGemId()
       @gridGemsIndex[[x,y]] = indexGem
-
+      
       if( indexGem = GEM_INDEX_MULTI )
         if( check2MultiGemBeside(x, y) )
           indexGem = 0
         elsif(  )
-
+          
         end
       elsif( indexGemElemental?(index) )
-
+        
       end
-
+      
       indexGem = checkIs3sameIndex(x, y)
       @gridGemsIndex[[x,y]] = indexGem
       # sMatrice += indexGem.to_s + " "
   end
-
-
-
+  
+  
+  
   #############################################################################
   # Check les combinaison d'index
   #############################################################################
   def indexGemElemental?(index)
     return ( index == GEM_INDEX_FIRE || index == GEM_INDEX_WATER || index == GEM_INDEX_WIND || index == GEM_INDEX_EARTH )
   end
-
+  
   #############################################################################
-  # Crï¿½e des gems alï¿½atoire sur la grille de 8x8
+  # Crée des gems aléatoire sur la grille de 8x8
   #############################################################################
   def createGemsOnBoard
     for y in 0...BOARD_MAX_Y
       for x in 0...BOARD_MAX_X
         index = 0
-
+        
         if( @gridGemsIndex[[x,y]] == GEM_INDEX_SKULL )
           index = getRandomSkullGemId
         elsif( @gridGemsIndex[[x,y]] == GEM_INDEX_MULTI )
@@ -194,22 +194,23 @@ class Game_Battle
         else
           index = @gridGemsIndex[[x,y]]
         end
-
+        
         if( index != 0 )
-          gem = @gemsFactory.create_gem(index, 51 + 27*x, 23+27*y)
+          gem = @gemsFactory.create_gem(index, 52 + 27*x, 22+27*y)
           gem.draw_icon()
         else
-          index = putAnotherRandomGem(x,y)
-          gem = @gemsFactory.create_gem(index, 51 + 27*x, 23+27*y)
+          index = 0 # putAnotherRandomGem(x,y)
+          gem = @gemsFactory.create_gem(index, 52 + 27*x, 22+27*y)
           gem.draw_icon()
+          gem.setOpacity(40)
         end
-
-
+        
+        
         @gridBoard[[x,y]] = gem
       end
     end
   end
-
+  
   #############################################################################
   # On met un autre gem si il y a un conflit de combinaison
   #############################################################################
@@ -218,48 +219,48 @@ class Game_Battle
       if( @gridGemsIndex[[x,y-1]] != nil && @gridGemsIndex[[x,y-1]] == GEM_GOLD_EXP )
         return getRandomElementalGemId
       else
-        return GEM_GOLD_EXP
+        return GEM_GOLD_EXP 
       end
     elsif( @gridGemsIndex[[x-1,y]] != nil && @gridGemsIndex[[x-1,y]] == GEM_GOLD_EXP )
       if( @gridGemsIndex[[x,y-1]] != nil && @gridGemsIndex[[x,y-1]] == GEM_INDEX_EXP )
         return getRandomElementalGemId
       else
-        return GEM_INDEX_EXP
+        return GEM_INDEX_EXP 
       end
     else
       if( @gridGemsIndex[[x,y-1]] != nil && @gridGemsIndex[[x,y-1]] == GEM_INDEX_EXP )
         return GEM_GOLD_EXP
       else( @gridGemsIndex[[x,y-1]] != nil && @gridGemsIndex[[x,y-1]] == GEM_INDEX_EXP )
-        return GEM_INDEX_EXP
+        return GEM_INDEX_EXP 
       end
     end
   end
-
+  
   def getRandomGemId
     firstSelection = rand(100)+1.to_i
-
-   case firstSelection
-  #  Gem ï¿½lemental
+    
+    case firstSelection
+      #Gem Élemental
       when 0 .. 50
         return getRandomElementalGemId
-      Gem Or
+      #Gem Or
       when 51 .. 65
         return 5
-      Gem Exp
+      #Gem Exp
       when 66 .. 80
         return 6
       #Gem Skull
       when 81 .. 100
         return 10
-      Gem Void (ne devrait jamais arriver)
+      #Gem Void (ne devrait jamais arriver)
       else
         return 0
     end
   end
-
+  
   def getRandomElementalGemId
     selection = rand(100)+1.to_i
-
+    
     case selection
       #Gem Feu
       when 1 .. 24
@@ -281,11 +282,11 @@ class Game_Battle
         return 0
     end
   end
-
+  
   #TODO
   def getRandomSkullGemId
     selection = rand(100)+1.to_i
-
+    
     if( @enemy.level.to_i < 15 )
       case selection
         #Skull
@@ -294,8 +295,8 @@ class Game_Battle
         #Skull +5
         else
           return 11
-      end
-    elsif( @enemy.level.to_i >= 15 && @enemy.level.to_i < 30 )
+      end  
+    elsif( @enemy.level.to_i >= 15 && @enemy.level.to_i < 30 ) 
       case selection
         #Skull
         when 1 .. 70
@@ -306,8 +307,8 @@ class Game_Battle
         #Skull +10
         else
           return 12
-      end
-    else
+      end  
+    else 
       case selection
         #Skull
         when 1 .. 50
@@ -318,13 +319,13 @@ class Game_Battle
         #Skull +10
         when 81 .. 95
           return 12
-        #Skull +20
+        #Skull +20  
         else
           return 13
-      end
+      end  
     end
   end
-
+  
   #TODO
   def getRandomMultiGemId
     selection = rand(100)+1.to_i
@@ -338,7 +339,7 @@ class Game_Battle
         #multi +4
         when 56 .. 75
           return 22
-        #multi +5
+        #multi +5  
         when 76 .. 87
           return 23
         #multi +6
@@ -350,14 +351,14 @@ class Game_Battle
         #multi +8
         else
           return 26
-    end
+    end 
   end
 
-
+  
   #############################################################################
-  #Permet de voir si il y une sï¿½rie de 3 gem et plus sur le board
+  #Permet de voir si il y une série de 3 gem et plus sur le board
   #############################################################################
-
+  
    def checkIs3sameIndex(x, y)
       index = @gridGemsIndex[[x, y]]
 
@@ -367,7 +368,7 @@ class Game_Battle
 
     return index
   end
-
+  
   def check3SameIndexHorizontal(x, y)
     if( @gridGemsIndex[[x-1, y]] != nil && @gridGemsIndex[[x-2, y]] != nil )
       if( @gridGemsIndex[[x, y]] == @gridGemsIndex[[x-1, y]] && @gridGemsIndex[[x, y]] == @gridGemsIndex[[x-2, y]])
@@ -376,7 +377,7 @@ class Game_Battle
     end
     return false
   end
-
+  
   def check3SameIndexvertical(x, y)
     if( @gridGemsIndex[[x, y-1]] != nil && @gridGemsIndex[[x, y-2]] != nil )
       if( @gridGemsIndex[[x, y]] == @gridGemsIndex[[x, y-1]] && @gridGemsIndex[[x, y]] == @gridGemsIndex[[x, y-2]])
@@ -385,9 +386,9 @@ class Game_Battle
     end
     return false
   end
-
+  
   #############################################################################
-  #Vï¿½rifie si 2 gem Multi sont cote ï¿½ cote
+  #Vérifie si 2 gem Multi sont cote à cote 
   #############################################################################
   def check2MultiGemBeside(x, y)
       if(@gridGemsIndex[[x, y]] == @gridGemsIndex[[x-1, y]])
@@ -398,9 +399,9 @@ class Game_Battle
         return false
       end
   end
-
+  
   #############################################################################
-  #Vï¿½rifie les combine horizontal des gem Multi avec gem ï¿½lï¿½mental
+  #Vérifie les combine horizontal des gem Multi avec gem Élémental
   #############################################################################
   def checkCombineMultiIndexHorizontal(x, y)
 
@@ -410,17 +411,17 @@ class Game_Battle
 #~       if( gemLeft1 != nil && gemLeft1.gemElemental? && gemRight1 != nil && gemRight1.gemMulti?)
 #~         return true
 #~       end
-
+      
       #TODO:
 
   end
 
-
+    
   #############################################################################
-  #Vï¿½rifie les combine vertical de gem Multi avec gem ï¿½lï¿½mental
+  #Vérifie les combine vertical de gem Multi avec gem Élémental
   #############################################################################
   def checkCombineMultiGemVertical(gemMulti)
-      # 0 0 X
+      # 0 0 X 
       if( @gridBoard[[(gemMulti.boardX), gemMulti.boardY-1]].gemElemental? && @gridBoard[[(gemMulti.boardX), gemMulti.boardY-2]].gemElemental? )
         return true
       #  X 0 0
@@ -429,28 +430,28 @@ class Game_Battle
       #  0 X 0
       elsif( @gridBoard[[(gemMulti.boardX), gemMulti.boardY-1]].gemElemental? && @gridBoard[[(gemMulti.boardX), gemMulti.boardY+1]].gemElemental?)
         return true
-      #  Xï¿½ 0 X
+      #  X² 0 X
       elsif( @gridBoard[[(gemMulti.boardX), gemMulti.boardY-1]].gemElemental? && @gridBoard[[(gemMulti.boardX), gemMulti.boardY-2]].gemMulti? )
         return true
-      #  X 0 Xï¿½
+      #  X 0 X²
       elsif( @gridBoard[[(gemMulti.boardX), gemMulti.boardY+1]].gemElemental? && @gridBoard[[(gemMulti.boardX), gemMulti.boardY+2]].gemMulti? )
         return true
       else
         return false
       end
-  end
-
+  end 
+    
   #############################################################################
-  #Vï¿½rifie si le gem est entourï¿½ de au moin x gem des 4 cï¿½tï¿½
+  #Vérifie si le gem est entouré de au moin x gem des 4 côté
   #############################################################################
   def isGemSurroundedBy1Gem(gem, nbGemSurrounded)
-    return (gem.boardX > 0 && gem.boardX < BOARD_MAX_X - nbGemSurrounded && gem.boardY > 0 && gem.boardY < BOARD_MAX_Y - nbGemSurrounded)
+    return (gem.boardX > 0 && gem.boardX < BOARD_MAX_X - nbGemSurrounded && gem.boardY > 0 && gem.boardY < BOARD_MAX_Y - nbGemSurrounded) 
   end
+  
 
-
-
+    
   #############################################################################
-  #Vï¿½rifie si les skullGem
+  #Vérifie si les skullGem
   #############################################################################
   def checkSkullGem(gem1, gem2)
     if(gem1 && gem2)
@@ -461,25 +462,25 @@ class Game_Battle
       end
     end
   end
-
+  
   #############################################################################
-  #Enlï¿½ves des gems du bord selon l'array @gemsToRemove
+  #Enlèves des gems du bord selon l'array @gemsToRemove
   #############################################################################
    def removeGems()
     for x in 0...@gemsToRemove.size
-        currentGem = @gemsToRemove[x]
+        currentGem = @gemsToRemove[x]    
         if( currentGem != nil )
           @gridBoard[[currentGem.getBoardIndexX, currentGem.getBoardIndexY]].clear_icon()
           @gridBoard[[currentGem.getBoardIndexX, currentGem.getBoardIndexY]] = nil
         end
     end
   end
-
+  
   #############################################################################
   #Clear le board au complet
   #############################################################################
    def clearBoard()
-
+     
     for x in 0...8
       for y in 0...8
         if(@gridBoard[[x,y]] != nil)
@@ -488,9 +489,9 @@ class Game_Battle
         end
       end
     end
-
+    
   end
-
+  
   #############################################################################
   #Check le mouvement de 2 gems
   #############################################################################
@@ -499,29 +500,29 @@ class Game_Battle
     $data_system.sounds[2].play
    # $game_system.battle_end_me.play
    ### inverse2gemsPosition(firstGem, secondGem)
-
+    
     #Le mouvement est horizontale
     if(firstGem.getBoardIndexY() == secondGem.getBoardIndexY())
       checkHorizontalGemMove( firstGem, secondGem)
     else #Le mouvement est vertical
       checkVerticalGemMove(firstGem, secondGem)
     end
-
+    
     return getDirectionSwitchGems(firstGem, secondGem)
     #removeGems()
-
+    
     #checkMoveIs3same(firstGem, secondGem)
-
+    
     #@gridBoard[[firstGem.getBoardIndexX, firstGem.getBoardIndexY]].clear_icon(@window)
     #@gridBoard[[secondGem.getBoardIndexX, secondGem.getBoardIndexY]].clear_icon(@window)
   end
-
+  
   #############################################################################
-  # Dï¿½termine la direction oï¿½ les gems doivent ï¿½tre switchï¿½ ( Haut-bas, bas-haut ..)
+  # Détermine la direction où les gems doivent être switché ( Haut-bas, bas-haut ..)
   #############################################################################
   def getDirectionSwitchGems(firstGem, secondGem)
     if( firstGem!= nil && secondGem != nil )
-      # -->
+      # --> 
       if( firstGem.getPosX() < secondGem.getPosX() )
         direction = 1
       # <--
@@ -541,10 +542,10 @@ class Game_Battle
     else
       direction = 0
     end
-
+    
     return direction
   end
-
+  
   #############################################################################
   #Inverse la position de 2 gems
   #############################################################################
@@ -559,16 +560,16 @@ class Game_Battle
       @gridBoard[[secondGem.getBoardIndexX(), secondGem.getBoardIndexY()]].draw_icon()
     end
   end
-
+  
   #############################################################################
-  #On Vï¿½rifie aprï¿½s mouvement si il y a une combinaison de 3 gems et +
+  #On Vérifie après mouvement si il y a une combinaison de 3 gems et +
   #############################################################################
   def checkMoveIs3same(firstGem, secondGem)
     #indexGemDestroyed = checkVerticalCombination(firstGem, secondGem)
-
+    
     isHorCombination = checkHorizontalGemMove(firstGem, secondGem)
     isVerCombination = checkVerticalGemMove(firstGem, secondGem)
-
+    
     #Si il y a une combinaison soit a l'horizontal ou vertical
     if( isHorCombination || isVerCombination )
       return true
@@ -576,40 +577,40 @@ class Game_Battle
       return false
     end
   end
-
+  
   #############################################################################
-  #Vï¿½rifie le mouvement horizontal de 2 gem
+  #Vérifie le mouvement horizontal de 2 gem
   #############################################################################
   def checkHorizontalGemMove(firstGem, secondGem)
     puts("Horizontal move !!")
-
+    
     isComb1 = horizontal_check( firstGem )
     isComb2 = horizontal_check( secondGem )
-
+    
     isComb3 = vertical_check( firstGem, secondGem )
     isComb4 = vertical_check( secondGem, firstGem )
-
+    
      #Si il y a une combinaison soit a l'horizontal ou vertical
     if( isComb1 || isComb2 || isComb3 || isComb4 )
       return true
     else
       return false
     end
-
+    
   end
-
+  
   #############################################################################
-  #Vï¿½rifie le mouvement vertical de 2 gem
+  #Vérifie le mouvement vertical de 2 gem
   #############################################################################
   def checkVerticalGemMove(firstGem, secondGem)
     puts("Vertical move !!")
-
+    
     isComb1 = horizontal_check( firstGem, secondGem )
     isComb2 = horizontal_check( secondGem, firstGem )
-
+    
     isComb3 = vertical_check( firstGem )
     isComb4 = vertical_check( secondGem )
-
+  
      #Si il y a une combinaison soit a l'horizontal ou vertical
     if( isComb1 || isComb2 || isComb3 || isComb4 )
       return true
@@ -617,14 +618,14 @@ class Game_Battle
       return false
     end
   end
-
+  
   #############################################################################
-  #Vï¿½rifie les gems qui sont a droite ou a gauche du gem courant
+  #Vérifie les gems qui sont a droite ou a gauche du gem courant
   #############################################################################
   def horizontal_check( currentGem, secondCurrentGem = nil )
     puts "horizontal_check"
     isHorizontalCombination = false
-
+    
     if( secondCurrentGem != nil )
       indexX = secondCurrentGem.getBoardIndexX()
       indexY = secondCurrentGem.getBoardIndexY()
@@ -632,40 +633,40 @@ class Game_Battle
       indexX = currentGem.getBoardIndexX()
       indexY = currentGem.getBoardIndexY()
     end
-
+    
     length = 0
     ## min = [0, indexX - 3].min
     ##max = [7, indexX + 4].max
     min = indexX - 3
     max = indexX + 4
-
+    
     for i in min...max
       if( @gridBoard[[i, indexY ]] == currentGem )
         length += 1
         if( length >= 3 && i == max - 1)
-          remove_gem(i - length +1, i, indexY, indexY)
+          remove_gem(i - length +1, i, indexY, indexY) 
           isHorizontalCombination = true
         end
         #elsif( @gridBoard[[i, indexY ]] != currentGem)
       else
         if( length >= 3)
-          remove_gem(i - length, i - 1, indexY, indexY)
+          remove_gem(i - length, i - 1, indexY, indexY) 
           isHorizontalCombination = true
         end
         length = 0
       end
     end
-
+    
     return isHorizontalCombination
   end
-
+  
   #############################################################################
-  #Vï¿½rifie les gems qui sont en haut ou en bas du gem courant
+  #Vérifie les gems qui sont en haut ou en bas du gem courant
   #############################################################################
   def vertical_check( currentGem, secondCurrentGem = nil )
     puts "vertical_check"
     isVerticalCombination = false
-
+    
     if( secondCurrentGem != nil )
       indexX = secondCurrentGem.getBoardIndexX()
       indexY = secondCurrentGem.getBoardIndexY()
@@ -673,18 +674,18 @@ class Game_Battle
       indexX = currentGem.getBoardIndexX()
       indexY = currentGem.getBoardIndexY()
     end
-
+    
     length = 0
     ##min = [indexY - 3, 0].min
     ##max = [indexY + 4, 7].max
     min = indexY - 3
     max = indexY + 4
-
+    
     for j in min...max
       if( @gridBoard[[indexX, j]] == currentGem )
         length += 1
         if( length >= 3 && j == max - 1)
-          remove_gem(indexX, indexX, j - length +1, j)
+          remove_gem(indexX, indexX, j - length +1, j) 
           isVerticalCombination = true
         end
       #elsif( @gridBoard[[ indexX, j ]] != currentGem)
@@ -696,35 +697,35 @@ class Game_Battle
         length = 0
       end
     end
-
+    
     return isVerticalCombination
   end
-
+  
   #############################################################################
-  #Enlï¿½ve les gems qui font une combinaison de 3 ou plus
+  #Enlève les gems qui font une combinaison de 3 ou plus
   #############################################################################
   def remove_gem(startX, finishX, startY, finishY)
     puts "remove_gem(" + startX.to_s + ", "+ finishX.to_s + ", "+ startY.to_s + ", "+ finishY.to_s
-
+     
     for i in startX...finishX + 1
       for j in startY...finishY + 1
         @gridBoard[[i, j]].doEffect()
         @gridBoard[[i, j]].clear_icon()
         @gridBoard[[i, j]] = nil
-      end
+      end 
     end
      #doCascadeBoard()
    end
-
+  
   #############################################################################
-  #Permet d'effectuer la cascade gem, vï¿½rifie les oï¿½ il y a des trous et
+  #Permet d'effectuer la cascade gem, vérifie les où il y a des trous et 
   #fait descendres les gem. Met un gem random si aucun gem ne situe en haut d'un trou.
   #############################################################################
 #~   def doCascadeBoard()
-#~     for y in 0...BOARD_MAX_Y
-#~       for x in 0...BOARD_MAX_X
+#~     for y in 0...BOARD_MAX_Y 
+#~       for x in 0...BOARD_MAX_X 
 #~           doCascadeGem(x, y)
-#~
+#~           
 #~            if( @gridBoard[[x, y]] != nil )
 #~              @gridBoard[[x, y]].clear_icon(@window)
 #~              #@gridBoard[[x, y]] = nil
@@ -734,7 +735,7 @@ class Game_Battle
 #~       end
 #~     end
 #~   end
-
+  
   #############################################################################
   #Permet d'effectuer la cascade d'un gem.
   #############################################################################
@@ -753,31 +754,31 @@ class Game_Battle
 #~              #else
 #~                #gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].getPosX(), @gridBoard[[x, 0]].getPosY())
 #~                #gem.draw_icon(@window)
-#~                #@gridBoard[[x, 0]] = gem
+#~                #@gridBoard[[x, 0]] = gem 
 #~             #end
 #~             j -= 1
 #~           end
-#~
+#~           
 #~           gem = @gemsFactory.create_gem(100, @gridBoard[[x, 0]].getPosX(), 3)
 #~           gem.draw_icon(@window)
-#~           @gridBoard[[x, 0]] = gem
-#~
+#~           @gridBoard[[x, 0]] = gem 
+#~           
 #~       gemBas = @gridBoard[[x, y-1]]
 #~       #gemHaut = @gemsFactory.create_gem(100, gemBas.getPosX(), gemBas.getPosY())
 #~       gemHaut = @gemsFactory.create_gem(100, gemBas.getPosX(), gemBas.getPosY())
-#~
+#~       
 #~       gemBas.setPosY( gemHaut.getPosY()+27 )
 #~       gemBas.draw_icon(@window)
 #~       #gemBas.setPosY( gemHaut.getPosY() )
 #~       gemHaut.draw_icon(@window)
-#~
-#~
+#~       
+#~       
 #~       @gridBoard[[x, y]] = gemBas
 #~       #@gridBoard[[x, y-1]] = gemBas
-#~
+#~       
 #~      # @gridBoard[[x, y-1]].clear_icon(@window)
 #~       @gridBoard[[x, y-1]] = gemHaut
-#~
+#~       
 #~       #@gridBoard[[x, y-1]].clear_icon(@window)
 #~       #@gridBoard[[x, y-1]] = nil
 #~       gemRandom = @gridBoard[[x, y-1]]
@@ -792,7 +793,7 @@ class Game_Battle
 #~          end
 #~          j -= 1
       #end
-
+      
 #~       if( j != 0 )
 #~         gem = @gridBoard[[x, y]]
 #~         gem.setPosY( gem.getPosY()+27*j )
@@ -802,7 +803,7 @@ class Game_Battle
 #~       end
 #~     end
 #~   end
-#~
+#~   
 #~   def doCascadeBoard()
 #~     x = BOARD_MAX_X
 #~     y = BOARD_MAX_Y
@@ -812,7 +813,7 @@ class Game_Battle
 #~         if( y == 0 )
 #~           if( @gridBoard[[x, y]] == nil )
 #~             puts("Create random gem ")
-#~             gem = @gemsFactory.create_gem(rand(NB_TYPE_GEMS)+1.to_i, 3 + 27*x, 3+27*y)
+#~             gem = @gemsFactory.create_gem(rand(NB_TYPE_GEMS)+1.to_i, 3 + 27*x, 3+27*y) 
 #~             gem.draw_icon(@window)
 #~             @gridBoard[[x, y]] = gem
 #~           end
@@ -820,7 +821,7 @@ class Game_Battle
 #~           doCascadeGem(x, y)
 #~         end
 #~         x -= 1
-#~       end
+#~       end 
 #~       x = BOARD_MAX_X
 #~       y -= 1
 #~     end

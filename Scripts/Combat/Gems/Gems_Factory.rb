@@ -25,6 +25,8 @@ class Gems_Factory
        Ice_Gem.new(x, y, boardX, boardY)
      when 8
        Thunder_Gem.new(x, y, boardX, boardY)
+	 when 9
+        Dark_Gem.new(x, y, boardX, boardY)
      when 10
        Skull_Gem.new(x, y, boardX, boardY)
      when 11

@@ -34,6 +34,8 @@ GAMEBOARD_POS_Y = 182
   end
 
 	def checkLeftClickOnBoard()
+		
+		inPauseMode = true
 		#puts(($cursor.x.to_i).to_s + " --- " + ($cursor.y.to_i).to_s)       
 		#Si la position du click est sur le board
 		if($cursor.x.to_i >= GAMEBOARD_POS_X && $cursor.x.to_i <= ( GAMEBOARD_POS_X + 216 ) && $cursor.y.to_i >= GAMEBOARD_POS_Y && $cursor.y.to_i <= ( GAMEBOARD_POS_Y + 216 )) 
@@ -80,29 +82,34 @@ GAMEBOARD_POS_Y = 182
 					               
 					#@scenePuzzle.spriteGem1 = @firstGem.getSprite()
 					#@scenePuzzle.spriteGem2 = @secondGem.getSprite()
-                
+					
 					@gamePuzzle.inverse2gemsPosition(@firstGem.getBoardIndexX, @firstGem.getBoardIndexY, secGemBoardPosX, secGemBoardPosY)
-				     validMove = @gamePuzzle.checkGemMove( @firstGem, @secondGem )
-                 
+					validMove =  @gamePuzzle.checkGemMove( @firstGem, @secondGem )
+                     
+                     
                 
-					@scenePuzzle.update_switch2Gem() if  @scenePuzzle != nil
+					#@scenePuzzle.update_switch2Gem() if  @scenePuzzle != nil
                 
-                	if( validMove == true )
-                      $data_system.sounds[22].play
-                      @gamePuzzle.addOneNbMove()
-                      @gamePuzzle.addBoardState()
-                      @scenePuzzle.getWindowChrono().incrementNbMove()
-                      @scenePuzzle.getWindowHeroMagicBars().refresh()
+                    if( validMove == true )
+                       $data_system.sounds[22].play
+                       @gamePuzzle.addOneNbMove()
+                       @gamePuzzle.addBoardState()
+                       @scenePuzzle.getWindowChrono().incrementNbMove()
+					   @gamePuzzle.doCascadeBoard()
+                      # @scenePuzzle.getWindowHeroMagicBars().refresh()
                       
-                      @gamePuzzle.removeAllGemsMatching
-                      @gamePuzzle.doCascadeBoard()
-                      @gamePuzzle.refreshBoard
-                	else
-                  		@gamePuzzle.inverse2gemsPosition(@firstGem.getBoardIndexX, @firstGem.getBoardIndexY, @secondGem.getBoardIndexX, @secondGem.getBoardIndexY)
-                  		@gamePuzzle.refreshBoard
-                	end
+                       #@gamePuzzle.removeAllGemsMatching
+                      # @gamePuzzle.doCascadeBoard()
+                      # @gamePuzzle.refreshBoard
+                	# else
+                  		# @gamePuzzle.inverse2gemsPosition(@firstGem.getBoardIndexX, @firstGem.getBoardIndexY, @secondGem.getBoardIndexX, @secondGem.getBoardIndexY)
+                  		# @gamePuzzle.refreshBoard
+					else
+						@gamePuzzle.inverse2gemsPosition(@firstGem.getBoardIndexX, @firstGem.getBoardIndexY, secGemBoardPosX, secGemBoardPosY)
+                    end
+					
 					clearCursors()
-                
+					inPauseMode = false
 					return 1 #validMove
 				#end
 				else
@@ -120,6 +127,7 @@ GAMEBOARD_POS_Y = 182
         end
         #clearCursors()
         @isSecondClick = false
+		inPauseMode = false
         return 0
     end
     

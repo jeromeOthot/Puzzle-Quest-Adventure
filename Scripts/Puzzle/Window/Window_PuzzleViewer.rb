@@ -73,22 +73,26 @@ class Window_PuzzleViewer < Window_Base
     #puts("create: " + posX.to_s + " : " + posY.to_s)
     gem = nil
     case code
-     when "e"
-      gem = @gemsFactory.create_gem(2, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY ) 
-    when "f"
-      gem = @gemsFactory.create_gem(1, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
+	when "-"
+      gem = @gemsFactory.create_gem(0, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY )
+     when "f"
+      gem = @gemsFactory.create_gem(1, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY ) 
+    when "w"
+      gem = @gemsFactory.create_gem(2, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
+    when "e"
+      gem = @gemsFactory.create_gem(3, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
+    when "a"
+      gem = @gemsFactory.create_gem(4,  (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
     when "g"
-      gem = @gemsFactory.create_gem(7, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
-    when "l"
-      gem = @gemsFactory.create_gem(13,  (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
-    when "o"
-      gem = @gemsFactory.create_gem(14, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)
+      gem = @gemsFactory.create_gem(5, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)
+    when "x"
+      gem = @gemsFactory.create_gem(6, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
+    when "i"
+      gem = @gemsFactory.create_gem(7, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)  
     when "t"
-      gem = @gemsFactory.create_gem(8, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 
-    when "s"
-      gem = @gemsFactory.create_gem(3, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)  
-    when "v"
-      gem = @gemsFactory.create_gem(4, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)
+      gem = @gemsFactory.create_gem(8, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)
+	when "d"
+      gem = @gemsFactory.create_gem(9, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY)
     else 
       gem = @gemsFactory.create_gem(0, (51 + 27*posX)+15, (3+27*posY)+70, posX, posY) 	  
     end

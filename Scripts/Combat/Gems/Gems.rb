@@ -66,12 +66,22 @@ class Gems
   def setType(type) @type = type end
 
   def doEffect() end
+  
+  def refresh() 
+    clear_icon()
+	draw_icon()
+  end
     
   def draw_icon()
-    @bitmapGem = Cache.picture("gemmes/gemme_" + getType().to_s)
+	@bitmapGem = Cache.picture("gemmes/gemme_" + getType().to_s)
     @sprite = getSprite()
-    @sprite.visible
-    @sprite.z = 200
+	@sprite.visible
+	if(getType() == 0)
+		@sprite.opacity = 0
+	#else
+	#	@sprite.visible	= false
+	end
+	@sprite.z = 200
   end
   
   def setOpacity(opacity)
@@ -141,6 +151,7 @@ end
 class Void_Gem < Gems
   def initialize(x, y, boardX, boardY)
      super( 0, x, y, boardX, boardY)
+	 #self.getSprite().visible = false
     # puts("fire")
   end
   
@@ -234,32 +245,32 @@ class Exp_Gem < Gems
   end
 end
 
-#~ class Light_Gem < Gems
-#~   def initialize(x, y)
-#~      super(7616, 9, x, y)     
-#~    end
-#~    
-#~   def doEffect()
-#~      puts("LightEffect: " + @actor.light_magic )
-#~      lightMana = @actor.light_magic.to_i
-#~      lightMana += 1
-#~      @actor.setLight_magic( lightMana.to_s )
-#~   end
-#~ end
-#~  
-#~ class Dark_Gem < Gems
-#~   def initialize(x, y)
-#~      super(7943, 10, x, y)
-#~      #puts("Dark")
-#~    end
-#~    
-#~   def doEffect()
-#~      puts("DarkEffect: " + @actor.dark_magic )
-#~     # darkMana = @actor.dark_magic.to_i
-#~      #darkMana += 1
-#~      #@actor.setDark_magic( darkMana.to_s )
-#~   end
-#~ end
+ class Light_Gem < Gems
+   def initialize(x, y, boardX, boardY)
+      super(30 , x, y, boardX, boardY)     
+    end
+    
+   def doEffect()
+      puts("LightEffect: " + @actor.light_magic )
+      lightMana = @actor.light_magic.to_i
+      lightMana += 1
+      @actor.setLight_magic( lightMana.to_s )
+   end
+ end
+  
+ class Dark_Gem < Gems
+   def initialize(x, y, boardX, boardY)
+      super(9, x, y, boardX, boardY)
+      #puts("Dark")
+    end
+    
+   def doEffect()
+      puts("DarkEffect: " + @actor.dark_magic )
+     # darkMana = @actor.dark_magic.to_i
+      #darkMana += 1
+      #@actor.setDark_magic( darkMana.to_s )
+   end
+ end
 
 class Skull_Gem < Gems
   def initialize(x, y, boardX, boardY)
