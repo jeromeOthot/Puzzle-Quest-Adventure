@@ -383,7 +383,7 @@ class Game_Puzzle
   #V�rifie le mouvement vertical de 2 gem
   #############################################################################
   def checkVerticalGemMove(firstGem, secondGem)
-
+	
     isComb1 = horizontal_check( firstGem, secondGem )
     isComb2 = horizontal_check( secondGem, firstGem )
     
@@ -471,6 +471,7 @@ class Game_Puzzle
             isVerticalCombination = true
 			break
           end
+		  length = 0
         end
       end
     #end

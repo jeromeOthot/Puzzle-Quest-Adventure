@@ -76,7 +76,6 @@ GAMEBOARD_POS_Y = 182
 						secGemBoardPosY = y
 						@firstGem  = nil
 						@secondGem = nil
-						puts("Second gem null");
 						clearCursors()
 					end
 					               
@@ -95,7 +94,14 @@ GAMEBOARD_POS_Y = 182
                        @gamePuzzle.addOneNbMove()
                        @gamePuzzle.addBoardState()
                        @scenePuzzle.getWindowChrono().incrementNbMove()
-					   @gamePuzzle.doCascadeBoard()
+					 #  @gamePuzzle.doCascadeBoard()
+					   
+					 #  while @gamePuzzle.checkCombinaison()
+					 #  @gamePuzzle.doCascadeBoard()
+					#	end
+					   
+					   #TODO Boucle cascade
+					   
                       # @scenePuzzle.getWindowHeroMagicBars().refresh()
                       
                        #@gamePuzzle.removeAllGemsMatching
