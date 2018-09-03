@@ -42,7 +42,7 @@ class Window_EnemySkills < Window_Base
   end
   
    def draw_magicIcon(x, y, type)
-    bitmap_magicIcon = Bitmap.new("Graphics/Pictures/magie_mini" + type.to_s)
+    bitmap_magicIcon = Bitmap.new("Graphics/Pictures/gemmes/magie_mini" + type.to_s)
     self.contents.blt(x, y, bitmap_magicIcon, Rect.new(0, 0, 12, 12))
   end 
   

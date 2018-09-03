@@ -196,11 +196,11 @@ class Game_Battle
         end
         
         if( index != 0 )
-          gem = @gemsFactory.create_gem(index, 52 + 27*x, 22+27*y)
+          gem = @gemsFactory.create_gem(index, 52 + 27*x, 22+27*y, x, y)
           gem.draw_icon()
         else
           index = 0 # putAnotherRandomGem(x,y)
-          gem = @gemsFactory.create_gem(index, 52 + 27*x, 22+27*y)
+          gem = @gemsFactory.create_gem(index, 52 + 27*x, 22+27*y, x ,y)
           gem.draw_icon()
           gem.setOpacity(40)
         end

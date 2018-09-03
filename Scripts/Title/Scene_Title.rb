@@ -143,7 +143,8 @@ class Scene_Title < Scene_Base
    # close_command_window
     fadeout_all
     $game_map.autoplay
-    SceneManager.goto(Scene_Map)
+    #SceneManager.goto(Scene_Map)
+	SceneManager.goto(Scene_Combat)
   end
   #--------------------------------------------------------------------------
   # * [Multiplayer] Command
